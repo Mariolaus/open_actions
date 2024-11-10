@@ -34,7 +34,3 @@ runs:
         github_id=$(echo "$github_id" | jq -r '.output')
         echo "github_id=${github_id}" >> $GITHUB_OUTPUT
       shell: bash
-
-    - name: Set output
-      run: echo "::set-output name=github_id::${{ env.github_id }}"
-      shell: bash
