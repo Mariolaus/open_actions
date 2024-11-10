@@ -1,0 +1,30 @@
+# .github/actions/add_worker_ip/action.yml
+
+name: "Remove GitHub Worker IP from Whitelist"
+description: ""
+inputs:
+  credentials_json:
+    description: "Credentials JSON secret"
+    required: true
+  github_id:
+    description: "ID to be removed from the whitelist"
+    required: true
+  url:
+    description: "IP address to add to the whitelist"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Google Auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ inputs.credentials_json }}
+
+    - name: Remove GitHub Worker IP from Authorized IPs
+      id: add_ip_step
+      run: |
+        ID_TOKEN=$(gcloud auth print-identity-token)
+        curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ inputs.url }}${{ inputs.github_id }}"
+      shell: bash
