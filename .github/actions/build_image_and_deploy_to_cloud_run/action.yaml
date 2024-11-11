@@ -40,6 +40,31 @@ runs:
       run: gcloud auth configure-docker ${{ inputs.REGION }}-docker.pkg.dev --quiet
       shell: bash
 
+    # check if repository exists
+    - name: Check if Artifact Registry Repository Exists
+      id: check_repo
+      run: |
+        # Check if the repository exists by trying to describe it
+        response=$(gcloud artifacts repositories describe ${{ inputs.SERVICE }} --location=${{ inputs.REGION }} --format="value(name)" || echo "not_found")
+        if [ "$response" == "not_found" ]; then
+          echo "Repository does not exist. Proceeding with creation."
+          echo "create_repo=true" >> $GITHUB_ENV
+        else
+          echo "Repository already exists."
+          echo "create_repo=false" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    # create repository if it does not exist
+    - name: Create Artifact Registry Repository
+      if: env.create_repo == 'true'
+      run: |
+        gcloud artifacts repositories create ${{ inputs.SERVICE }} \
+          --repository-format=Docker \
+          --location=${{ inputs.REGION }} \
+          --description="Docker repository for ${{ inputs.SERVICE }} project"
+      shell: bash
+
     # Build Image
     - id: build_image
       env:
@@ -48,15 +73,6 @@ runs:
         image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ github.sha }}"
         ${{ inputs.run_command }}
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
-      shell: bash
-
-    # create repository
-    - name: Create Artifact Registry Repository
-      run: |
-        gcloud artifacts repositories create ${{ inputs.SERVICE }} \
-          --repository-format=Docker \
-          --location=${{ inputs.REGION }} \
-          --description="Docker repository for ${{ inputs.SERVICE }} project"
       shell: bash
 
     # Push image in Artifact Registry
