@@ -50,6 +50,15 @@ runs:
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
 
+    # create repository
+    - name: Create Artifact Registry Repository
+      run: |
+        gcloud artifacts repositories create ${{ inputs.SERVICE }} \
+          --repository-format=Docker \
+          --location=${{ inputs.REGION }} \
+          --description="Docker repository for ${{ inputs.SERVICE }} project"
+      shell: bash
+
     # Push image in Artifact Registry
     - name: Push Docker Image to Artifact Registry
       run: |
