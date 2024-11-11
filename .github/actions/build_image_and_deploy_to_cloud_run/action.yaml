@@ -27,7 +27,7 @@ runs:
     - name: Create Git Tag
       id: create_tag
       run: |
-        TAG="v$(date +'%Y-%m-%d_%H:%M')"  # Example tag: vYYYYMMDDHHMM
+        TAG="v$(date +'%Y-%m-%d_%H%M')"  # Example tag: vYYYYMMDDHHMM
         echo "Created Git tag: $TAG"
         git tag $TAG
         git push https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/${{ github.repository }} $TAG
