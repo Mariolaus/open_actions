@@ -8,11 +8,11 @@ inputs:
     description: "Cloud Run service name"
     required: true
   REGION:
-    description: "Cloud Run service name"
+    description: "Gcloud Region"
     required: true
     default: "europe-west8"
   run_command:
-    description: ""
+    description: "Docker build command"
     required: true
 
 runs:
@@ -39,12 +39,11 @@ runs:
     # Build Image
     - id: build_image
       env:
-        DOCKER_BUILDKIT: 1  # Enable Docker BuildKit
+        DOCKER_BUILDKIT: 1
       run: |
         image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ github.sha }}"
         ${{ inputs.run_command }}
-        echo "image_id=$image_id" >> $GITHUB_OUTPUT 
-
+        echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
 
     # Push image in Artifact Registry
