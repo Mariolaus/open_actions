@@ -36,10 +36,6 @@ runs:
       run: gcloud auth configure-docker ${{ inputs.REGION }}-docker.pkg.dev --quiet
       shell: bash
 
-    # Checkout repo
-    - name: Check out the repository
-      uses: actions/checkout@v3
-
     # Build Image
     - id: build_image
       env:
