@@ -31,6 +31,7 @@ runs:
     # Docker configuration
     - name: Configure Docker for Google Artifact Registry
       run: gcloud auth configure-docker ${{ inputs.REGION }}-docker.pkg.dev --quiet
+      shell: bash
 
     # Build Image
     - id: build_image
@@ -47,11 +48,13 @@ runs:
           --secret id=GCP_RUN_SSH_GCLOUD_CREDENTIALS,src=gcloud_credentials \
           -t $image_id .
         echo "image_id=$image_id" >> $GITHUB_OUTPUT 
+      shell: bash
 
     # Push image in Artifact Registry
     - name: Push Docker Image to Artifact Registry
       run: |
         docker push "${{ steps.build_image.outputs.image_id }}"
+      shell: bash
 
     # Deploy su Cloud Run
     - name: Deploy to Cloud Run
@@ -61,4 +64,4 @@ runs:
         service: ${{ inputs.SERVICE }}
         region: ${{ inputs.REGION }}
         image: "${{ steps.build_image.outputs.image_id }}"
-
+      shell: bash
