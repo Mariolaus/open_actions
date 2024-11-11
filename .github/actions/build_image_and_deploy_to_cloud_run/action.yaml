@@ -19,6 +19,10 @@ runs:
   using: "composite"
   steps:
 
+    # Checkout repo
+    - name: Check out the repository
+      uses: actions/checkout@v3
+
     #Authenticate in Google
     - name: Google Auth
       uses: google-github-actions/auth@v2
