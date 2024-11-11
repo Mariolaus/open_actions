@@ -3,9 +3,6 @@
 name: "Add GitHub Worker IP to Whitelist"
 description: "Adds the GitHub Actions runner IP to an authorized IP list"
 inputs:
-  credentials_json:
-    description: "Credentials JSON secret"
-    required: true
   ip:
     description: "IP address to add to the whitelist"
     required: true
@@ -24,7 +21,7 @@ runs:
     - name: Google Auth
       uses: google-github-actions/auth@v2
       with:
-        credentials_json: ${{ inputs.credentials_json }}
+        credentials_json: ${{ env.credentials_json }}
 
     - name: Add GitHub Worker IP to Authorized IPs
       id: add_ip_step
