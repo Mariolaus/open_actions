@@ -26,13 +26,13 @@ runs:
     # Configure Git to access all repos, required only if you run tests
     - name: Configure Git to Use Personal Access Token, required only if you run tests
       run: |
-        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
       shell: bash
 
     # Create a new Git tag
     - name: Create Git Tag
       id: create_tag
       run: |
+        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
         TAG="v$(date +'%Y-%m-%d=%H%M')"  # Example tag: vYYYYMMDDHHMM
         echo "Created Git tag: $TAG"
         # Create and push the tag to GitHub
