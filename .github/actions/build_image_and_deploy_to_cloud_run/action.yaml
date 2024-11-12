@@ -14,6 +14,10 @@ inputs:
   run_command:
     description: "Docker build command"
     required: true
+  tag:
+    description: "Github tag"
+    required: false
+    default: "latest"
 
 runs:
   using: "composite"
@@ -70,7 +74,7 @@ runs:
       env:
         DOCKER_BUILDKIT: 1
       run: |
-        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ github.sha }}"
+        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ inputs.tag }}"
         ${{ inputs.run_command }}
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
