@@ -14,6 +14,10 @@ inputs:
   run_command:
     description: "Docker build command"
     required: true
+  tag:
+    description: "Github tag"
+    required: false
+    default: "latest"
 
 runs:
   using: "composite"
@@ -22,20 +26,6 @@ runs:
     # Checkout repo
     - name: Check out the repository
       uses: actions/checkout@v3
-
-    # Create a new Git tag
-    - name: Create Git Tag
-      id: create_tag
-      run: |
-        TAG="v$(date +'%Y-%m-%d-%H%M')"
-        echo "GIT_TAG=$TAG" >> $GITHUB_ENV   #${{ env.GIT_TAG }}
-      shell: bash
-
-    - name: Tag snapshot
-      uses: tvdias/github-tagger@v0.0.1
-      with:
-        repo-token: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-        tag: ${{ env.GIT_TAG }}
 
     #Authenticate in Google
     - name: Google Auth
@@ -84,7 +74,7 @@ runs:
       env:
         DOCKER_BUILDKIT: 1
       run: |
-        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
+        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ inputs.tag }}"
         ${{ inputs.run_command }}
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
@@ -103,4 +93,4 @@ runs:
         service: ${{ inputs.SERVICE }}
         region: ${{ inputs.REGION }}
         image: "${{ steps.build_image.outputs.image_id }}"
-        tag: "${{ env.GIT_TAG }}"
+        tag: "${{ inputs.tag }}"
