@@ -7,7 +7,6 @@ inputs:
   SERVICE:
     description: "Cloud Run service name"
     required: true
-    default: "${GITHUB_REPOSITORY#*/}"
   REGION:
     description: "Gcloud Region"
     required: true
