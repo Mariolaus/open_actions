@@ -1,0 +1,73 @@
+name: Deploy to Cloud Run
+
+on:
+  workflow_call:
+    inputs:
+      gcp_credentials:
+        description: "GCP Build and Deploy Credentials"
+        required: true
+        type: string
+      read_all_repos_token:
+        description: "Token to read all repos"
+        required: true
+        type: string
+      devops_microvm_rsa:
+        description: "SSH key for microvm access"
+        required: true
+        type: string
+      project_id:
+        description: "GCP Project ID"
+        required: true
+        type: string
+      service_name:
+        description: "Service name for Cloud Run"
+        required: true
+        type: string
+      action_url:
+        description: "Base URL for IP management API"
+        required: true
+        type: string
+
+jobs:
+  install-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Add IP to whitelist
+      - name: Enable Github worker IP
+        id: add_ip
+        uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
+        env:
+          credentials_json: ${{ inputs.gcp_credentials }}
+        with:
+          ip: $(curl ifconfig.me)
+          url: "${{ inputs.action_url }}/add_ip?ip="
+
+      # Build image and deploy to Cloud Run
+      - name: Build image and Deploy to Cloud Run
+        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
+        env:
+          DEVOPS_MICROVM_RSA: ${{ inputs.devops_microvm_rsa }}
+          READ_ALL_REPOS_TOKEN: ${{ inputs.read_all_repos_token }}
+          DEVOPS_GCLOUD_CREDENTIALS: ${{ inputs.gcp_credentials }}
+        with:
+          PROJECT_ID: ${{ inputs.project_id }}
+          SERVICE: ${{ inputs.service_name }}
+          run_command: |
+            echo "${{ env.DEVOPS_MICROVM_RSA }}" > gcp_run_ssh_rsa_key
+            echo "${{ env.READ_ALL_REPOS_TOKEN }}" > read_all_repos_token
+            echo "${{ env.DEVOPS_GCLOUD_CREDENTIALS }}" > gcloud_credentials
+            docker build \
+              --secret id=GCP_RUN_SSH_RSA_KEY,src=gcp_run_ssh_rsa_key \
+              --secret id=READ_ALL_REPOS_TOKEN,src=read_all_repos_token \
+              --secret id=GCP_RUN_SSH_GCLOUD_CREDENTIALS,src=gcloud_credentials \
+              -t $image_id .
+
+      # Clean up: Remove IP from whitelist
+      - name: Disable Github worker IP
+        uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@main
+        if: always()
+        with:
+          github_id: "${{ steps.add_ip.outputs.github_id }}"
+          credentials_json: ${{ inputs.gcp_credentials }}
+          url: "${{ inputs.action_url }}/delete_ip?github_id="
