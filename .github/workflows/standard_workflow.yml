@@ -28,17 +28,8 @@ jobs:
         env:
           credentials_json: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
         with:
-          ip: "$(curl ifconfig.me)"
+          ip: $(curl ifconfig.me)
           url: "${{ inputs.action_url }}/add_ip?ip="
-
-      # Configure Git to access all repos
-      - name: Configure Git to Use Personal Access Token
-        run: |
-          git config --global url."https://x-access-token:${{ secrets.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
-
-      # Checkout repo
-      - name: Check out the repository
-        uses: actions/checkout@v3
 
       # Build image and deploy to Cloud Run
       - name: Build image and Deploy to Cloud Run
