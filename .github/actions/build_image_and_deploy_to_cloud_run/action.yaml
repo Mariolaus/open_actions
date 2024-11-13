@@ -95,7 +95,7 @@ runs:
         docker push "${{ steps.build_image.outputs.image_id }}"
       shell: bash
 
-    # Deploy su Cloud Run
+    # Deploy on Cloud Run
     - name: Deploy to Cloud Run
       id: deploy_cr
       uses: google-github-actions/deploy-cloudrun@v1
