@@ -28,8 +28,6 @@ runs:
       run: |
         ID_TOKEN=$(gcloud auth print-identity-token)
         github_id=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ inputs.url }}${{ inputs.ip }}")
-        echo $github_id
-        echo "${{ inputs.ip }}"
         github_id=$(echo "$github_id" | jq -r '.output')
         echo "github_id=${github_id}" >> $GITHUB_OUTPUT
       shell: bash
