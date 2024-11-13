@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      -
       # Add IP to whitelist
       - name: Enable Github worker IP
         id: add_ip
