@@ -1,0 +1,31 @@
+name: "Invoke GCloud API using service account"
+description: ""
+inputs:
+  param:
+    description: "API param"
+    required: true
+  url:
+    description: "API url"
+    required: true
+
+outputs:
+  out:
+    description: "API output"
+    value: ${{ steps.add_ip_step.outputs.out  }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Google Auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ env.credentials_json }}
+
+    - name: Invoke API
+      id: invoke
+      run: |
+        ID_TOKEN=$(gcloud auth print-identity-token)
+        out=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ inputs.url }}${{ inputs.param }}")
+        out=$(echo "out" | jq -r '.output')
+        echo "out=${out}" >> $GITHUB_OUTPUT
+      shell: bash
