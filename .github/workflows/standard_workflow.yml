@@ -28,7 +28,7 @@ jobs:
         env:
           credentials_json: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
         with:
-          ip: $(curl ifconfig.me)
+          ip: "$(curl ifconfig.me)"
           url: "${{ inputs.action_url }}/add_ip?ip="
 
       # Configure Git to access all repos
