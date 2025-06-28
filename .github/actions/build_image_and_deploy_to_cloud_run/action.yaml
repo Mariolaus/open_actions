@@ -14,6 +14,9 @@ inputs:
   run_command:
     description: "Docker build command"
     required: true
+  branch:
+    description: "branch to checkout"
+    required: true
 
 runs:
   using: "composite"
@@ -22,6 +25,10 @@ runs:
     # Checkout repo
     - name: Check out the repository
       uses: actions/checkout@v3
+      with:
+        ref: ${{ inputs.branch }}
+        fetch-depth: 0
+
 
     # Create a new Git tag
     - name: Create Git Tag
