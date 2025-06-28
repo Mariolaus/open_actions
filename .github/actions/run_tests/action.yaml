@@ -3,10 +3,6 @@ description: "XXX"
 
 runs:
   using: "composite"
-  strategy:
-    fail-fast: false
-    matrix:
-      python-version: [ "3.12" ]
   steps:
     # Checkout repository
     - uses: actions/checkout@v4
@@ -15,7 +11,7 @@ runs:
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.12"
 
     - uses: actions/checkout@v4
 
@@ -28,13 +24,16 @@ runs:
         poetry install
         poetry build
         pip install ./dist/*.whl
+      shell: bash
 
     # Lint with flake8
     - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      shell: bash
 
     #  Test with pytest
     - name: Test with pytest
       run: pytest
+      shell: bash
