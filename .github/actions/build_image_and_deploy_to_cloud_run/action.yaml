@@ -31,11 +31,11 @@ runs:
         echo "GIT_TAG=$TAG" >> $GITHUB_ENV   #${{ env.GIT_TAG }}
       shell: bash
 
-    #- name: Tag snapshot
-    #  uses: tvdias/github-tagger@v0.0.1
-    #  with:
-    #    repo-token: ${{ env.READ_ALL_REPOS_TOKEN }}
-    #    tag: ${{ env.GIT_TAG }}
+    - name: Tag snapshot
+      uses: tvdias/github-tagger@v0.0.1
+      with:
+        repo-token: ${{ env.READ_ALL_REPOS_TOKEN }}
+        tag: ${{ env.GIT_TAG }}
 
     #Authenticate in Google
     - name: Google Auth
