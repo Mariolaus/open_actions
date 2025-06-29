@@ -19,7 +19,7 @@ on:
         description: "should it run python tests?"
         required: true
         type: boolean
-      run_command:
+      deploy_command:
         description: "deploy command"
         required: false
         type: string
@@ -53,10 +53,15 @@ jobs:
       - name: PROD - Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' # or UAT, then add the branch name to the service todo
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
+        env:
+          DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
+          READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+          DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
+          GCP_BUILD_AND_DEPLOY_PROD: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
         with:
           PROJECT_ID: ${{ inputs.project_id }}
           SERVICE: ${{ inputs.service_name }}
-          run_command: ${{ inputs.run_command }}
+          run_command: ${{ inputs.deploy_command }}
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP

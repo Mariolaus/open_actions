@@ -34,14 +34,14 @@ runs:
     - name: Tag snapshot
       uses: tvdias/github-tagger@v0.0.1
       with:
-        repo-token: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+        repo-token: ${{ env.READ_ALL_REPOS_TOKEN }}
         tag: ${{ env.GIT_TAG }}
 
     #Authenticate in Google
     - name: Google Auth
       uses: google-github-actions/auth@v2
       with:
-        credentials_json: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+        credentials_json: ${{ env.GCP_BUILD_AND_DEPLOY_PROD }}
 
     # Set up Google Cloud SDK
     - name: Set up Google Cloud SDK
