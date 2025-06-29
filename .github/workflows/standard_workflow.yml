@@ -15,6 +15,10 @@ on:
         description: "Base URL for IP management API"
         required: true
         type: string
+      run_tests:
+        description: "should it run python tests?"
+        required: false
+        type: boolean
 
 jobs:
   install-dependencies:
@@ -37,6 +41,7 @@ jobs:
           url: "${{ inputs.action_url }}/add_ip?ip="
 
       - name: run tests
+        if: ${{ inputs.run_tests }}
         id: run_tests
         uses: Mariolaus/open_actions/.github/actions/run_tests@main
 
