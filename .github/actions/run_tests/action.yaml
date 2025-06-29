@@ -4,6 +4,15 @@ description: "XXX"
 runs:
   using: "composite"
   steps:
+
+    - name: Add IP to whitelist
+      uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
+      with:
+        ip: ${{ steps.get_ip.outputs.ip }}
+        url: "${{ inputs.action_url }}/add_ip?ip="
+      env:
+        credentials_json: '${{ env.GCP_BUILD_AND_DEPLOY_PROD }}'
+
     # Checkout repository
     - uses: actions/checkout@v4
 
