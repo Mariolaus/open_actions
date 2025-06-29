@@ -26,7 +26,7 @@ runs:
         ip: ${{ steps.get_ip.outputs.ip }}
         url: "${{ inputs.action_url }}/add_ip?ip="
       env:
-        credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+        credentials_json: '${{ env.GCP_BUILD_AND_DEPLOY_PROD }}'
 
     - name: Run Tests
       if: ${{ inputs.run_tests == 'true' }}
@@ -40,15 +40,15 @@ runs:
         SERVICE: ${{ inputs.service_name }}
         run_command: ${{ inputs.run_command }}
       env:
-        DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
-        READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-        DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
-        GCP_BUILD_AND_DEPLOY_PROD: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+        DEVOPS_MICROVM_RSA: ${{ env.DEVOPS_MICROVM_RSA }}
+        READ_ALL_REPOS_TOKEN: ${{ env.READ_ALL_REPOS_TOKEN }}
+        DEVOPS_GCLOUD_CREDENTIALS: ${{ env.DEVOPS_GCLOUD_CREDENTIALS }}
+        GCP_BUILD_AND_DEPLOY_PROD: '${{ env.GCP_BUILD_AND_DEPLOY_PROD }}'
 
     - name: Remove IP from whitelist
       if: always()
       uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@main
       with:
         github_id: "${{ steps.add_ip.outputs.github_id }}"
-        credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+        credentials_json: '${{ env.GCP_BUILD_AND_DEPLOY_PROD }}'
         url: "${{ inputs.action_url }}/delete_ip?github_id="
