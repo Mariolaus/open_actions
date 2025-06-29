@@ -19,10 +19,9 @@ on:
         description: "should it run python tests?"
         required: true
         type: boolean
-      deploy_command:
+      run_command:
         description: "deploy command"
         required: false
-        type: string
 
 jobs:
   install-dependencies:
@@ -61,7 +60,7 @@ jobs:
         with:
           PROJECT_ID: ${{ inputs.project_id }}
           SERVICE: ${{ inputs.service_name }}
-          run_command: ${{ inputs.deploy_command }}
+          run_command: ${{ inputs.run_command }}
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
