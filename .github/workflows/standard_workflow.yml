@@ -29,11 +29,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: echo_ip
-        run: |
-          echo $(curl ifconfig.me)
-        shell: bash
-
       # Add IP to whitelist
       - name: Enable Github worker IP
         id: add_ip
@@ -57,12 +52,11 @@ jobs:
           DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
-          GCP_BUILD_AND_DEPLOY_PROD: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+          GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
         with:
           PROJECT_ID: ${{ inputs.project_id }}
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
-
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
