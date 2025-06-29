@@ -1,0 +1,59 @@
+name: "Standard workflow"
+description: "Adds GitHub runner IP, runs tests, deploys to Cloud Run, and removes IP"
+inputs:
+  project_id:
+    description: "GCP Project ID"
+    required: true
+  service_name:
+    description: "Service name for Cloud Run"
+    required: true
+  action_url:
+    description: "Base URL for IP management API"
+    required: true
+  run_tests:
+    description: "Should it run Python tests?"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Add IP to whitelist
+      uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
+      with:
+        ip: ${{ steps.get_ip.outputs.ip }}
+        url: "${{ inputs.action_url }}/add_ip?ip="
+      env:
+        credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+
+    - name: Run Tests
+      if: ${{ inputs.run_tests == 'true' }}
+      uses: Mariolaus/open_actions/.github/actions/run_tests@main
+
+    - name: Build and Deploy to Cloud Run
+      if: ${{ github.ref == 'refs/heads/PROD' }}
+      uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
+      with:
+        PROJECT_ID: ${{ inputs.project_id }}
+        SERVICE: ${{ inputs.service_name }}
+        run_command: |
+          echo "${{ secrets.DEVOPS_MICROVM_RSA }}" > gcp_run_ssh_rsa_key
+          echo "${{ secrets.READ_ALL_REPOS_TOKEN }}" > read_all_repos_token
+          echo "${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}" > gcloud_credentials
+          docker build \
+            --secret id=GCP_RUN_SSH_RSA_KEY,src=gcp_run_ssh_rsa_key \
+            --secret id=READ_ALL_REPOS_TOKEN,src=read_all_repos_token \
+            --secret id=GCP_RUN_SSH_GCLOUD_CREDENTIALS,src=gcloud_credentials \
+            -t $image_id .
+      env:
+        DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
+        READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+        DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
+        GCP_BUILD_AND_DEPLOY_PROD: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+
+    - name: Remove IP from whitelist
+      if: always()
+      uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@main
+      with:
+        github_id: "${{ steps.add_ip.outputs.github_id }}"
+        credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+        url: "${{ inputs.action_url }}/delete_ip?github_id="
