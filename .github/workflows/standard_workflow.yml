@@ -27,7 +27,7 @@ on:
 jobs:
   install-dependencies:
     runs-on: ubuntu-latest
-
+    if: github.ref_type != 'tag'
     steps:
       # Add IP to whitelist
       - name: Enable Github worker IP
