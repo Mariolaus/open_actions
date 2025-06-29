@@ -21,6 +21,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: echo_ip
+        run: |
+          echo $(curl ifconfig.me)
+        shell: bash
+
       # Add IP to whitelist
       - name: Enable Github worker IP
         id: add_ip
