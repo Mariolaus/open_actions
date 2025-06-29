@@ -20,6 +20,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    # Configure Git for private repo access
+    - name: Configure Git to Use Personal Access Token
+      run: |
+        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
+      shell: bash
+
     - name: Add IP to whitelist
       uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
       with:
