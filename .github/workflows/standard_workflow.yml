@@ -19,6 +19,10 @@ on:
         description: "should it run python tests?"
         required: true
         type: boolean
+      run_command:
+        description: "XXX"
+        required: false
+        type: string
 
 jobs:
   install-dependencies:
@@ -57,15 +61,8 @@ jobs:
         with:
           PROJECT_ID: ${{ inputs.project_id }}
           SERVICE: ${{ inputs.service_name }}
-          run_command: |
-            echo "${{ env.DEVOPS_MICROVM_RSA }}" > gcp_run_ssh_rsa_key
-            echo "${{ env.READ_ALL_REPOS_TOKEN }}" > read_all_repos_token
-            echo "${{ env.DEVOPS_GCLOUD_CREDENTIALS }}" > gcloud_credentials
-            docker build \
-              --secret id=GCP_RUN_SSH_RSA_KEY,src=gcp_run_ssh_rsa_key \
-              --secret id=READ_ALL_REPOS_TOKEN,src=read_all_repos_token \
-              --secret id=GCP_RUN_SSH_GCLOUD_CREDENTIALS,src=gcloud_credentials \
-              -t $image_id .
+          run_command: ${{ inputs.run_command }}
+
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
