@@ -31,6 +31,8 @@ runs:
     - name: Run Tests
       if: ${{ inputs.run_tests == 'true' }}
       uses: Mariolaus/open_actions/.github/actions/run_tests@main
+      env:
+        READ_ALL_REPOS_TOKEN: ${{ env.READ_ALL_REPOS_TOKEN }}
 
     - name: Build and Deploy to Cloud Run
       if: ${{ github.ref == 'refs/heads/PROD' }}
