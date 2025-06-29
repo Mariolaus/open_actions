@@ -17,7 +17,7 @@ on:
         type: string
       run_tests:
         description: "should it run python tests?"
-        required: false
+        required: true
         type: boolean
 
 jobs:
