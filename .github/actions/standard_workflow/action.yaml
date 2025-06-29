@@ -20,11 +20,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    # Configure Git for private repo access
-    - name: Configure Git to Use Personal Access Token
-      run: |
-        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
-      shell: bash
 
     - name: Add IP to whitelist
       uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
@@ -33,6 +28,13 @@ runs:
         url: "${{ inputs.action_url }}/add_ip?ip="
       env:
         credentials_json: '${{ env.GCP_BUILD_AND_DEPLOY_PROD }}'
+
+    # Configure Git for private repo access
+    - name: Configure Git to Use Personal Access Token
+      run: |
+        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
+      shell: bash
+
 
     - name: Run Tests
       if: ${{ inputs.run_tests == 'true' }}
