@@ -3,10 +3,6 @@ name: Deploy to Cloud Run
 on:
   workflow_call:
     inputs:
-      project_id:
-        description: "GCP Project ID"
-        required: true
-        type: string
       service_name:
         description: "Service name for Cloud Run"
         required: true
@@ -53,7 +49,7 @@ jobs:
           DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
           DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
         with:
-          PROJECT_ID: ${{ inputs.project_id }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
 
@@ -65,7 +61,7 @@ jobs:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
-          PROJECT_ID: ${{ inputs.project_id }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
 
