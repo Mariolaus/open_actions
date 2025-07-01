@@ -53,6 +53,18 @@ jobs:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
 
+      - name: Sanitize branch name for Cloud Run UAT
+        if: github.ref != 'refs/heads/PROD'
+        id: sanitize
+        run: |
+          RAW_BRANCH="${GITHUB_REF_NAME}"
+          # Convert to lowercase, replace anything not allowed with '-', and trim
+          SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-*//' | sed 's/-*$//')
+          SAFE_BRANCH=${SAFE_BRANCH:0:50}  # Truncate if needed
+          echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
+          echo "::set-output name=branch::$SAFE_BRANCH"
+        shell: bash
+
       # Build image and deploy to Cloud Run if we are on branch UAT only
       - name: UAT -- Build image and Deploy to Cloud Run
         if: github.ref != 'refs/heads/PROD'
@@ -62,7 +74,7 @@ jobs:
           GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
-          SERVICE: ${{ inputs.service_name }}
+          SERVICE: ${{ github.ref_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
 
       # Clean up: Remove IP from whitelist
