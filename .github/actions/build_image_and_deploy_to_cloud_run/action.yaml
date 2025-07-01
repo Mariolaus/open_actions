@@ -80,7 +80,7 @@ runs:
       shell: bash
 
     # Build Image
-    - id: build_image custom build
+    - id: build_image_custom
       if: inputs.run_command != ''
       env:
         DOCKER_BUILDKIT: 1
@@ -91,7 +91,7 @@ runs:
       shell: bash
 
     # Build Image
-    - id: build_image default build
+    - id: build_image_default
       if: inputs.run_command == ''
       env:
         DOCKER_BUILDKIT: 1
