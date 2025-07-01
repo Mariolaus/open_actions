@@ -89,7 +89,7 @@ jobs:
           GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
-          SERVICE: ${{ github.ref_name }}-${{ steps.sanitize.outputs.branch }}
+          SERVICE: ${{ steps.sanitize.outputs.branch }}-${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
 
       # Clean up: Remove IP from whitelist
