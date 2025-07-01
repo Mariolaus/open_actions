@@ -63,7 +63,7 @@ jobs:
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+          GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
           PROJECT_ID: ${{ inputs.project_id }}
           SERVICE: ${{ inputs.service_name }}
