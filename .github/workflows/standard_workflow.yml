@@ -77,7 +77,7 @@ jobs:
           SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-*//' | sed 's/-*$//')
           SAFE_BRANCH=${SAFE_BRANCH:0:50}  # Truncate if needed
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
-          echo "::set-output name=branch::$SAFE_BRANCH"
+          echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
         shell: bash
 
       # Build image and deploy to Cloud Run if we are on branch UAT only
