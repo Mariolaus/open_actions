@@ -24,7 +24,7 @@ runs:
       id: add_ip_step
       run: |
         ID_TOKEN=$(gcloud auth print-identity-token)
-        github_id=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}${{ inputs.ip }}")
+        github_id=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}/add_ip?github_id="${{ inputs.ip }}")
         github_id=$(echo "$github_id" | jq -r '.output')
         echo "github_id=${github_id}" >> $GITHUB_OUTPUT
       shell: bash

@@ -20,5 +20,5 @@ runs:
       id: add_ip_step
       run: |
         ID_TOKEN=$(gcloud auth print-identity-token)
-        curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}${{ inputs.github_id }}"
+        curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}/delete_ip?github_id="${{ inputs.github_id }}"
       shell: bash
