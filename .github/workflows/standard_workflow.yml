@@ -7,14 +7,11 @@ on:
         description: "Service name for Cloud Run"
         required: true
         type: string
-      action_url:
-        description: "Base URL for IP management API"
-        required: true
-        type: string
       run_tests:
         description: "should it run python tests?"
         required: true
         type: boolean
+        default: true
       run_command:
         description: "XXX"
         required: false
@@ -32,7 +29,6 @@ jobs:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
         with:
           ip: $(curl ifconfig.me)
-          url: "${{ inputs.action_url }}/add_ip?ip="
 
       - name: Validate service_name input
         run: |
@@ -60,7 +56,7 @@ jobs:
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
           DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
           DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
         with:
@@ -86,7 +82,7 @@ jobs:
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          GCP_BUILD_AND_DEPLOY_PROD: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
+          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
@@ -99,4 +95,3 @@ jobs:
         with:
           github_id: "${{ steps.add_ip.outputs.github_id }}"
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
-          url: "${{ inputs.action_url }}/delete_ip?github_id="
