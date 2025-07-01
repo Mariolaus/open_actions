@@ -34,6 +34,21 @@ jobs:
           ip: $(curl ifconfig.me)
           url: "${{ inputs.action_url }}/add_ip?ip="
 
+      - name: Validate service_name input
+        run: |
+          NAME="${{ inputs.service_name }}"
+          echo "Validating service name: $NAME"
+          # Cloud Run service name must:
+          # - be <= 63 chars
+          # - start with a lowercase letter
+          # - only contain lowercase letters, numbers, and dashes
+          # - end with a letter or number
+          if [[ ! "$NAME" =~ ^[a-z]([-a-z0-9]*[a-z0-9])?$ ]]; then
+            echo "❌ ERROR: '$NAME' is not a valid Cloud Run service name"
+            exit 1
+          fi
+          echo "✅ Valid service name"
+
       - name: run tests
         if: ${{ inputs.run_tests }}
         id: run_tests
