@@ -80,27 +80,12 @@ runs:
       shell: bash
 
     # Build Image
-    - id: build_image_custom
-      if: inputs.run_command != ''
+    - id: build_image
       env:
         DOCKER_BUILDKIT: 1
       run: |
         image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
         ${{ inputs.run_command }}
-        echo "image_id=$image_id" >> $GITHUB_OUTPUT
-      shell: bash
-
-    # Build Image
-    - id: build_image_default
-      if: inputs.run_command == ''
-      env:
-        DOCKER_BUILDKIT: 1
-      run: |
-        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
-        echo "${READ_ALL_REPOS_TOKEN}" > read_all_repos_token && \
-        docker build \
-          --secret id=READ_ALL_REPOS_TOKEN,src=read_all_repos_token \
-          -t $image_id .
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
 
