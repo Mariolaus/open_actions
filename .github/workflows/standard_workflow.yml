@@ -60,8 +60,8 @@ jobs:
           GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
           DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
           DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
-        with:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
+        with:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
 
@@ -84,8 +84,8 @@ jobs:
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
-        with:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
+        with:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
 

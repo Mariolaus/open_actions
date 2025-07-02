@@ -47,7 +47,7 @@ runs:
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
-        project_id: ${{ inputs.PROJECT_ID }}
+        project_id: ${{ env.PROJECT_ID }}
 
     # Docker configuration
     - name: Configure Docker for Google Artifact Registry
@@ -84,7 +84,7 @@ runs:
       env:
         DOCKER_BUILDKIT: 1
       run: |
-        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ inputs.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
+        image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
         ${{ inputs.run_command }}
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
       shell: bash
