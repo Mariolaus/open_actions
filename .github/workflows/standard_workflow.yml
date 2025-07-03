@@ -71,9 +71,12 @@ jobs:
         id: sanitize
         run: |
           RAW_BRANCH="${GITHUB_REF_NAME}"
-          # Convert to lowercase, replace anything not allowed with '-', and trim
+          BASE_SERVICE="${{ inputs.service_name }}"
+          MAX_TOTAL=46
+          # Calculate max branch length
+          MAX_BRANCH_LENGTH=$((MAX_TOTAL - ${#BASE_SERVICE} - 1))
           SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-*//' | sed 's/-*$//')
-          SAFE_BRANCH=${SAFE_BRANCH:0:29}  # Truncate if needed
+          SAFE_BRANCH=${SAFE_BRANCH:0:$MAX_BRANCH_LENGTH}
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
           echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
         shell: bash
