@@ -72,7 +72,7 @@ jobs:
           RAW_BRANCH="${GITHUB_REF_NAME}"
           # Convert to lowercase, replace anything not allowed with '-', and trim
           SAFE_BRANCH=$(echo "$RAW_BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/^-*//' | sed 's/-*$//')
-          SAFE_BRANCH=${SAFE_BRANCH:0:50}  # Truncate if needed
+          SAFE_BRANCH=${SAFE_BRANCH:0:29}  # Truncate if needed
           echo "SAFE_BRANCH=$SAFE_BRANCH" >> $GITHUB_ENV
           echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
         shell: bash
