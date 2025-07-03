@@ -16,6 +16,7 @@ on:
         description: "docker build command"
         required: false
         type: string
+        default: true
 
 jobs:
   install-dependencies:
