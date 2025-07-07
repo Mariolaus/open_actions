@@ -1,0 +1,46 @@
+name: check_code_quality
+description: "XXX"
+
+runs:
+  using: "composite"
+  steps:
+    # Checkout repository
+    - uses: actions/checkout@v4
+
+    # Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+      # Configure Git for private repo access
+    - name: Configure Git to Use Personal Access Token
+      run: |
+        git config --global url."https://x-access-token:${{ env.READ_ALL_REPOS_TOKEN }}@github.com/".insteadOf "https://github.com/"
+      shell: bash
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest black isort
+        poetry install
+        poetry build
+        pip install ./dist/*.whl
+      shell: bash
+
+    - name: Check formatting with black
+      run: black --check .
+      shell: bash
+
+    - name: Check import order with isort
+      run: isort --check-only .
+      shell: bash
+
+    # Lint with flake8
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      shell: bash
