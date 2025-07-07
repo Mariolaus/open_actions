@@ -25,9 +25,6 @@ runs:
         curl -sSL https://install.python-poetry.org | python3 -
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest black isort
-        poetry install
-        poetry build
-        pip install ./dist/*.whl
       shell: bash
 
     - name: Check formatting with black
