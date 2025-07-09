@@ -103,7 +103,7 @@ runs:
         cloudrun_region: ${{ inputs.REGION }}
         secrets_list: my-secret-1,my-secret-2
       env:
-        GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+        GCP_BUILD_AND_DEPLOY: ${{ env.GCP_BUILD_AND_DEPLOY_PROD }}
 
     # Deploy on Cloud Run
     - name: Deploy to Cloud Run
