@@ -4,9 +4,6 @@ inputs:
   gcp_project:
     description: 'GCP Project ID'
     required: true
-  service_account_id:
-    description: 'New service account ID'
-    required: true
   cloudrun_service:
     description: 'Cloud Run service name'
     required: true
@@ -32,17 +29,25 @@ runs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
+    - name: Derive service account ID
+      id: derive_sa
+      shell: bash
+      run: |
+        # Derive from Cloud Run service name (alphanumeric, lowercase, max 30 chars)
+        SA_ID=$(echo "${{ inputs.cloudrun_service }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-30)
+        echo "service_account_id=$SA_ID" >> "$GITHUB_OUTPUT"
+
     - name: Create service account
       shell: bash
       run: |
-        gcloud iam service-accounts create "${{ inputs.service_account_id }}" \
+        gcloud iam service-accounts create "${{ steps.derive_sa.outputs.service_account_id }}" \
           --description="Service account for Cloud Run and Secrets" \
           --display-name="GitHub Action Service Account"
 
     - name: Grant Cloud Run invoke permission
       shell: bash
       run: |
-        SERVICE_EMAIL="${{ inputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
         gcloud run services add-iam-policy-binding "${{ inputs.cloudrun_service }}" \
           --region="${{ inputs.REGION }}" \
           --member="serviceAccount:$SERVICE_EMAIL" \
@@ -51,7 +56,7 @@ runs:
     - name: Grant Secret Manager access
       shell: bash
       run: |
-        SERVICE_EMAIL="${{ inputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
         IFS=',' read -ra SECRETS <<< "${{ inputs.secrets_list }}"
         for SECRET in "${SECRETS[@]}"; do
           gcloud secrets add-iam-policy-binding "$SECRET" \

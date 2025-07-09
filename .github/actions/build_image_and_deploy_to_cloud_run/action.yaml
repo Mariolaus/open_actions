@@ -99,7 +99,6 @@ runs:
       uses: Mariolaus/open_actions/.github/actions/setup-gcp-service-account
       with:
         gcp_project: env.PROJECT_ID
-        service_account_id: cloudrun-runner-${{ inputs.SERVICE }}
         cloudrun_service: ${{ inputs.SERVICE }}
         cloudrun_region: ${{ inputs.REGION }}
         secrets_list: my-secret-1,my-secret-2
