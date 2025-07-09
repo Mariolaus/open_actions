@@ -49,15 +49,40 @@ runs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
-    - name: Setup GCP Service Account
-      uses: Mariolaus/open_actions/.github/actions/add_service_account@main
-      with:
-        gcp_project: env.PROJECT_ID
-        cloudrun_service: ${{ inputs.SERVICE }}
-        cloudrun_region: ${{ inputs.REGION }}
-        secrets_list: my-secret-1,my-secret-2
-      env:
-        GCP_BUILD_AND_DEPLOY: ${{ env.GCP_BUILD_AND_DEPLOY_PROD }}
+    - name: Derive service account ID
+      id: derive_sa
+      shell: bash
+      run: |
+        # Derive from Cloud Run service name (alphanumeric, lowercase, max 30 chars)
+        SA_ID=$(echo "${{ inputs.SERVICE }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-30)
+        echo "service_account_id=$SA_ID" >> "$GITHUB_OUTPUT"
+
+    - name: Create service account
+      shell: bash
+      run: |
+        gcloud iam service-accounts create "${{ steps.derive_sa.outputs.service_account_id }}" \
+          --description="Service account for Cloud Run and Secrets" \
+          --display-name="GitHub Action Service Account"
+
+    - name: Grant Cloud Run invoke permission
+      shell: bash
+      run: |
+        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
+        gcloud run services add-iam-policy-binding "${{ inputs.SERVICE }}" \
+          --region="${{ inputs.REGION }}" \
+          --member="serviceAccount:$SERVICE_EMAIL" \
+          --role="roles/run.invoker"
+
+    - name: Grant Secret Manager access
+      shell: bash
+      run: |
+        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
+        IFS=',' read -ra SECRETS <<< "a, b"
+        for SECRET in "${SECRETS[@]}"; do
+          gcloud secrets add-iam-policy-binding "$SECRET" \
+            --member="serviceAccount:$SERVICE_EMAIL" \
+            --role="roles/secretmanager.secretAccessor"
+        done
 
     # Docker configuration
     - name: Configure Docker for Google Artifact Registry
