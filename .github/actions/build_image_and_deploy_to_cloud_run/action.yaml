@@ -55,9 +55,21 @@ runs:
       run: |
         # Derive from Cloud Run service name (alphanumeric, lowercase, max 30 chars)
         SA_ID=$(echo "${{ inputs.SERVICE }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-30)
-        echo "service_account_id=$SA_ID" >> "$GITHUB_OUTPUT"
+        echo "service_account_id=cloudrun-runner-$SA_ID" >> "$GITHUB_OUTPUT"
+
+    - name: Check if service account exists
+      id: sa_check
+      shell: bash
+      run: |
+        SA_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        if gcloud iam service-accounts describe "$SA_EMAIL" &>/dev/null; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+        fi
 
     - name: Create service account
+      if: steps.sa_check.outputs.exists == 'false'
       shell: bash
       run: |
         gcloud iam service-accounts create "${{ steps.derive_sa.outputs.service_account_id }}" \
@@ -139,5 +151,6 @@ runs:
         region: ${{ inputs.REGION }}
         image: "${{ steps.build_image.outputs.image_id }}"
         tag: "${{ env.GIT_TAG }}"
+        service_account: {{ steps.derive_sa.outputs.service_account_id }}
         env_vars: |
           PROJECT_ID=${{ env.PROJECT_ID }}
