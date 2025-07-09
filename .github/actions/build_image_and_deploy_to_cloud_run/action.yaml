@@ -159,6 +159,6 @@ runs:
         region: ${{ inputs.REGION }}
         image: "${{ steps.build_image.outputs.image_id }}"
         tag: "${{ env.GIT_TAG }}"
-        service_account: {{ steps.derive_sa.outputs.service_account_id }}
+        service_account: ${{ steps.derive_sa.outputs.service_account_id }}
         env_vars: |
           PROJECT_ID=${{ env.PROJECT_ID }}
