@@ -1,0 +1,60 @@
+name: 'Setup GCP Service Account'
+description: 'Creates a GCP service account with Cloud Run and Secret Manager access.'
+inputs:
+  gcp_project:
+    description: 'GCP Project ID'
+    required: true
+  service_account_id:
+    description: 'New service account ID'
+    required: true
+  cloudrun_service:
+    description: 'Cloud Run service name'
+    required: true
+  secrets_list:
+    description: 'Comma-separated list of Secret Manager secrets'
+    required: true
+  REGION:
+    description: "Gcloud Region"
+    required: false
+    default: "europe-west8"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Google Auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ env.credentials_json }}
+
+    # Set up Google Cloud SDK
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    - name: Create service account
+      shell: bash
+      run: |
+        gcloud iam service-accounts create "${{ inputs.service_account_id }}" \
+          --description="Service account for Cloud Run and Secrets" \
+          --display-name="GitHub Action Service Account"
+
+    - name: Grant Cloud Run invoke permission
+      shell: bash
+      run: |
+        SERVICE_EMAIL="${{ inputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        gcloud run services add-iam-policy-binding "${{ inputs.cloudrun_service }}" \
+          --region="${{ inputs.REGION }}" \
+          --member="serviceAccount:$SERVICE_EMAIL" \
+          --role="roles/run.invoker"
+
+    - name: Grant Secret Manager access
+      shell: bash
+      run: |
+        SERVICE_EMAIL="${{ inputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        IFS=',' read -ra SECRETS <<< "${{ inputs.secrets_list }}"
+        for SECRET in "${SECRETS[@]}"; do
+          gcloud secrets add-iam-policy-binding "$SECRET" \
+            --member="serviceAccount:$SERVICE_EMAIL" \
+            --role="roles/secretmanager.secretAccessor"
+        done
