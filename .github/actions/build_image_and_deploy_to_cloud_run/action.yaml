@@ -14,6 +14,10 @@ inputs:
   run_command:
     description: "Docker build command"
     required: true
+  secrets:
+    description: "xxx"
+    required: false
+
 
 runs:
   using: "composite"
@@ -89,10 +93,11 @@ runs:
           --role="roles/run.invoker"
 
     - name: Grant Secret Manager access
+      if: inputs.secrets != ''
       shell: bash
       run: |
         SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        IFS=',' read -ra SECRETS <<< "MICRO_VM_EXTERNAL_IP"
+        IFS=',' read -ra SECRETS <<< {{ input.secrets }}
         for SECRET in "${SECRETS[@]}"; do
           gcloud secrets add-iam-policy-binding "$SECRET" \
             --member="serviceAccount:$SERVICE_EMAIL" \
