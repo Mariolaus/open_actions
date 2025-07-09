@@ -80,7 +80,6 @@ runs:
           --display-name="GitHub Action Service Account"
 
     - name: Grant Cloud Run invoke permission
-      if: steps.sa_check.outputs.exists == 'false'
       shell: bash
       run: |
         SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
