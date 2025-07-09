@@ -64,7 +64,7 @@ runs:
       id: sa_check
       shell: bash
       run: |
-        SA_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ inputs.gcp_project }}.iam.gserviceaccount.com"
+        SA_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
         if gcloud iam service-accounts describe "$SA_EMAIL" &>/dev/null; then
           echo "exists=true" >> $GITHUB_OUTPUT
         else
@@ -80,6 +80,7 @@ runs:
           --display-name="GitHub Action Service Account"
 
     - name: Grant Cloud Run invoke permission
+      if: steps.sa_check.outputs.exists == 'false'
       shell: bash
       run: |
         SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
