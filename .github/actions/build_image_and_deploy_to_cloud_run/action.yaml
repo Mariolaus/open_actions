@@ -92,7 +92,7 @@ runs:
       shell: bash
       run: |
         SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        IFS=',' read -ra SECRETS <<< "a, b"
+        IFS=',' read -ra SECRETS <<< "MICRO_VM_EXTERNAL_IP"
         for SECRET in "${SECRETS[@]}"; do
           gcloud secrets add-iam-policy-binding "$SECRET" \
             --member="serviceAccount:$SERVICE_EMAIL" \
