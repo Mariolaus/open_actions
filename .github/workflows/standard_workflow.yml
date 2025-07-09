@@ -20,6 +20,7 @@ on:
       secrets:
         description: "xxx"
         required: false
+        type: string
 
 jobs:
   install-dependencies:
