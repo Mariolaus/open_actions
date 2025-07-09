@@ -54,7 +54,7 @@ runs:
       shell: bash
       run: |
         # sanitize the Cloud Run service name
-        SERVICE_NAME=$(echo "${{ inputs.cloudrun_service }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')
+        SERVICE_NAME=$(echo "${{ inputs.SERVICE }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')
         SA_ID="run-${SERVICE_NAME}"
         # GCP limits service account ID to max 30 chars
         SA_ID=${SA_ID:0:30}
