@@ -53,9 +53,12 @@ runs:
       id: derive_sa
       shell: bash
       run: |
-        # Derive from Cloud Run service name (alphanumeric, lowercase, max 30 chars)
-        SA_ID=$(echo "${{ inputs.SERVICE }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-' | cut -c1-30)
-        echo "service_account_id=cloudrun-runner-$SA_ID" >> "$GITHUB_OUTPUT"
+        # sanitize the Cloud Run service name
+        SERVICE_NAME=$(echo "${{ inputs.cloudrun_service }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')
+        SA_ID="run-${SERVICE_NAME}"
+        # GCP limits service account ID to max 30 chars
+        SA_ID=${SA_ID:0:30}
+        echo "service_account_id=$SA_ID" >> $GITHUB_OUTPUT
 
     - name: Check if service account exists
       id: sa_check
