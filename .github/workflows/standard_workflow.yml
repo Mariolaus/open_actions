@@ -17,6 +17,9 @@ on:
         required: false
         type: string
         default: true
+      secrets:
+        description: "xxx"
+        required: false
 
 jobs:
   install-dependencies:
@@ -73,6 +76,7 @@ jobs:
         with:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
+          secrets: ${{ inputs.secrets }}
 
       - name: Sanitize branch name for Cloud Run UAT
         if: github.ref != 'refs/heads/PROD'
@@ -101,6 +105,7 @@ jobs:
         with:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
+          secrets: ${{ inputs.secrets }}
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
