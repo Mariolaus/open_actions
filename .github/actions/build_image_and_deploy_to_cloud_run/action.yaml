@@ -83,15 +83,6 @@ runs:
           --description="Service account for Cloud Run and Secrets" \
           --display-name="GitHub Action Service Account"
 
-    - name: Grant Cloud Run invoke permission
-      shell: bash
-      run: |
-        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        gcloud run services add-iam-policy-binding "${{ inputs.SERVICE }}" \
-          --region="${{ inputs.REGION }}" \
-          --member="serviceAccount:$SERVICE_EMAIL" \
-          --role="roles/run.invoker"
-
     - name: Grant Secret Manager access
       if: inputs.secrets != ''
       shell: bash
@@ -178,3 +169,13 @@ runs:
         service_account: ${{ steps.derive_sa.outputs.service_account_id }}
         env_vars: |
           PROJECT_ID=${{ env.PROJECT_ID }}
+
+  # Grant Cloud Run invoke permission to the service account
+    - name: Grant Cloud Run invoke permission
+      shell: bash
+      run: |
+        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
+        gcloud run services add-iam-policy-binding "${{ inputs.SERVICE }}" \
+          --region="${{ inputs.REGION }}" \
+          --member="serviceAccount:$SERVICE_EMAIL" \
+          --role="roles/run.invoker"
