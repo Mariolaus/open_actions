@@ -99,9 +99,25 @@ runs:
         SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
         IFS=',' read -ra SECRETS <<< "${{ inputs.secrets }}"
         for SECRET in "${SECRETS[@]}"; do
-          gcloud secrets add-iam-policy-binding "$SECRET" \
+          echo "Granting access to secret: $SECRET"
+        
+          OUTPUT=$(gcloud secrets add-iam-policy-binding "$SECRET" \
             --member="serviceAccount:$SERVICE_EMAIL" \
-            --role="roles/secretmanager.secretAccessor"
+            --role="roles/secretmanager.secretAccessor" 2>&1) || RC=$?
+        
+          if [[ $RC -eq 0 ]]; then
+            echo "Access granted to $SECRET"
+          elif echo "$OUTPUT" | grep -q "NOT_FOUND"; then
+            echo "Secret $SECRET does not exist, skipping"
+          elif echo "$OUTPUT" | grep -q "PermissionDenied\|403"; then
+            echo "Permission denied while updating $SECRET"
+            echo "$OUTPUT"
+            exit 1
+          else
+            echo "Unexpected error while updating $SECRET"
+            echo "$OUTPUT"
+            exit 1
+          fi
         done
 
     # Docker configuration
