@@ -83,6 +83,7 @@ runs:
           --description="Service account for Cloud Run and Secrets" \
           --display-name="GitHub Action Service Account"
 
+
     - name: Grant Secret Manager access
       if: inputs.secrets != ''
       shell: bash
