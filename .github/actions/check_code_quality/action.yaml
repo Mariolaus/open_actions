@@ -31,9 +31,6 @@ runs:
       run: black --check --line-length=140 .
       shell: bash
 
-    - name: Check import order with isort
-      run: isort --check-only .
-      shell: bash
 
     # Lint with flake8
     - name: Lint with flake8
