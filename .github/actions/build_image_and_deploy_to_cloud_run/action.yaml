@@ -53,65 +53,6 @@ runs:
       with:
         project_id: ${{ env.PROJECT_ID }}
 
-    - name: Derive service account ID
-      id: derive_sa
-      shell: bash
-      run: |
-        # sanitize the Cloud Run service name
-        SERVICE_NAME=$(echo "${{ inputs.SERVICE }}" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z0-9-')
-        SA_ID="run-${SERVICE_NAME}"
-        # GCP limits service account ID to max 30 chars
-        SA_ID=${SA_ID:0:30}
-        echo "service_account_id=$SA_ID" >> $GITHUB_OUTPUT
-
-    - name: Check if service account exists
-      id: sa_check
-      shell: bash
-      run: |
-        SA_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        if gcloud iam service-accounts describe "$SA_EMAIL" &>/dev/null; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Create service account
-      if: steps.sa_check.outputs.exists == 'false'
-      shell: bash
-      run: |
-        gcloud iam service-accounts create "${{ steps.derive_sa.outputs.service_account_id }}" \
-          --description="Service account for Cloud Run and Secrets" \
-          --display-name="GitHub Action Service Account"
-
-
-    - name: Grant Secret Manager access
-      if: inputs.secrets != ''
-      shell: bash
-      run: |
-        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        IFS=',' read -ra SECRETS <<< "${{ inputs.secrets }}"
-        for SECRET in "${SECRETS[@]}"; do
-          echo "Granting access to secret: $SECRET"
-        
-          OUTPUT=$(gcloud secrets add-iam-policy-binding "$SECRET" \
-            --member="serviceAccount:$SERVICE_EMAIL" \
-            --role="roles/secretmanager.secretAccessor" 2>&1) || RC=$?
-        
-          if [[ $RC -eq 0 ]]; then
-            echo "Access granted to $SECRET"
-          elif echo "$OUTPUT" | grep -q "NOT_FOUND"; then
-            echo "Secret $SECRET does not exist, skipping"
-          elif echo "$OUTPUT" | grep -q "PermissionDenied\|403"; then
-            echo "Permission denied while updating $SECRET"
-            echo "$OUTPUT"
-            exit 1
-          else
-            echo "Unexpected error while updating $SECRET"
-            echo "$OUTPUT"
-            exit 1
-          fi
-        done
-
     # Docker configuration
     - name: Configure Docker for Google Artifact Registry
       run: gcloud auth configure-docker ${{ inputs.REGION }}-docker.pkg.dev --quiet
@@ -170,13 +111,3 @@ runs:
         service_account: ${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
         env_vars: |
           PROJECT_ID=${{ env.PROJECT_ID }}
-
-  # Grant Cloud Run invoke permission to the service account
-    - name: Grant Cloud Run invoke permission
-      shell: bash
-      run: |
-        SERVICE_EMAIL="${{ steps.derive_sa.outputs.service_account_id }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
-        gcloud run services add-iam-policy-binding "${{ inputs.SERVICE }}" \
-          --region="${{ inputs.REGION }}" \
-          --member="serviceAccount:$SERVICE_EMAIL" \
-          --role="roles/run.invoker"
