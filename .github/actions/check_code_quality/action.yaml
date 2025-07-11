@@ -27,10 +27,13 @@ runs:
         python -m pip install flake8 pytest black isort
       shell: bash
 
+    - name: Check import order with isort
+      run: isort --check-only . --profile=black
+      shell: bash
+
     - name: Check formatting with black
       run: black --check --line-length=140 .
       shell: bash
-
 
     # Lint with flake8
     - name: Lint with flake8
