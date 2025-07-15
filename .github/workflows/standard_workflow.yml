@@ -21,6 +21,11 @@ on:
         description: "xxx"
         required: false
         type: string
+      skip_build_and_deploy:
+        description: "Skip build and deploy steps"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   install-dependencies:
@@ -66,7 +71,7 @@ jobs:
 
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
-        if: github.ref == 'refs/heads/PROD'
+        if: github.ref == 'refs/heads/PROD' && !inputs.skip_build_and_deploy
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
@@ -97,7 +102,7 @@ jobs:
 
       # Build image and deploy to Cloud Run if we are on branch UAT only
       - name: UAT -- Build image and Deploy to Cloud Run
-        if: github.ref != 'refs/heads/PROD'
+        if: github.ref != 'refs/heads/PROD' && !inputs.skip_build_and_deploy
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
