@@ -24,7 +24,7 @@ runs:
       run: |
         curl -sSL https://install.python-poetry.org | python3 -
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
+        python -m pip install flake8 pytest coverage
         poetry install
         poetry build
         pip install ./dist/*.whl
@@ -37,7 +37,19 @@ runs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       shell: bash
 
-    #  Test with pytest
-    - name: Test with pytest
-      run: pytest
+    # Run tests with coverage and fail under 70%
+    - name: Run tests with coverage (fail if < 70%)
+      run: |
+        coverage run -m pytest
+        coverage report --fail-under=70
       shell: bash
+
+    - name: Generate HTML coverage report
+      run: coverage html
+      shell: bash
+
+    - name: Upload HTML coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-html
+        path: htmlcov/
