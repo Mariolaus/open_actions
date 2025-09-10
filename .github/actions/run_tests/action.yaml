@@ -41,5 +41,5 @@ runs:
     - name: Run tests with coverage (fail if < 80%)
       run: |
         coverage run -m pytest
-        coverage report --fail-under=20
+        coverage report --fail-under=80
       shell: bash
