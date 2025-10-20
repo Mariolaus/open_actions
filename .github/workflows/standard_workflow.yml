@@ -85,11 +85,11 @@ jobs:
         uses: Mariolaus/open_actions/.github/actions/manage_config_file@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-        with:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
+        with:
           SERVICE: ${{ inputs.service_name }}
           CONFIG_PATH: "./"
-          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
 
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
