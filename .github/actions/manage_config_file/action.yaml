@@ -53,8 +53,8 @@ runs:
         local_config_path="${{ inputs.CONFIG_PATH }}/${{ inputs.SERVICE }}_config.json"
 
         # Remote blob name
-        remote_blob_name="${{ inputs.SERVICE }}_config.json"
-
+        remote_blob_name="$(echo "${{ inputs.SERVICE }}" | sed 's/-/_/g')_config.json"
+        
         echo "Uploading configuration for service '${{ inputs.SERVICE }}'..."
         echo "Bucket: gs://$bucket_name"
         echo "Local file: $local_config_path"
