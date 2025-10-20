@@ -65,5 +65,5 @@ runs:
           echo "ℹ️ Config file does not exist. Proceeding with upload."
         fi
 
-        gsutil cp -a private "$local_config_path" "gs://$bucket_name/$blob_name"
+        gsutil cp "$local_config_path" "gs://$bucket_name/$blob_name"
         echo "✅ Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
