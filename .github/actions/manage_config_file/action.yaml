@@ -47,17 +47,18 @@ runs:
         set -e
 
         # Bucket name convention: config_cloudrun_{compact_projectid}
+        echo "PROJECT_ID: '${{ inputs.PROJECT_ID }}'"
         bucket_name="config_cloudrun_$(echo "${{ inputs.PROJECT_ID }}" | tr -d '-')"
+        echo "Target bucket name: $bucket_name"
 
         # Local path to config file
         local_config_path="${{ inputs.CONFIG_PATH }}/${{ inputs.SERVICE }}_config.json"
 
         # Remote blob name
         remote_blob_name="$(echo "${{ inputs.SERVICE }}" | sed 's/-/_/g')_config.json"
+        echo "Blob name: $remote_blob_name"
         
         echo "Uploading configuration for service '${{ inputs.SERVICE }}'..."
-        echo "Bucket: gs://$bucket_name"
-        echo "Local file: $local_config_path"
 
         if [ ! -f "$local_config_path" ]; then
           echo "❌ Config file not found: $local_config_path"
