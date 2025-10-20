@@ -47,7 +47,7 @@ runs:
         SERVICE: ${{ inputs.SERVICE }}
       run: |
         set -e
-        PROJECT_ID="${{ inputs.project_id }}"
+        PROJECT_ID="${{ inputs.PROJECT_ID }}"
         # Bucket name convention: config_cloudrun_{compact_project_id}
         echo "PROJECT_ID: '$PROJECT_ID'"
         bucket_name="config_cloudrun_$(echo "$PROJECT_ID" | tr -d '-')"
