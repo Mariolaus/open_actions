@@ -34,7 +34,7 @@ jobs:
       # Add IP to whitelist
       - name: Enable Github worker IP
         id: add_ip
-        uses: Mariolaus/open_actions/.github/actions/add_worker_ip@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/add_worker_ip@feature/add_config_file
         env:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
@@ -59,19 +59,19 @@ jobs:
       - name: run tests
         if: ${{ inputs.run_tests }}
         id: run_tests
-        uses: Mariolaus/open_actions/.github/actions/run_tests@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/run_tests@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Check code quality
         if: github.ref == 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/check_code_quality@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/check_code_quality@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Manage configuration file PROD
         if: github.ref == 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/manage_config_file@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
         with:
@@ -82,7 +82,7 @@ jobs:
 
       - name: Manage configuration file UAT
         if: github.ref != 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/manage_config_file@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
         with:
@@ -94,7 +94,7 @@ jobs:
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy
-        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
@@ -123,7 +123,7 @@ jobs:
       # Build image and deploy to Cloud Run if we are on branch UAT only
       - name: UAT -- Build image and Deploy to Cloud Run
         if: github.ref != 'refs/heads/PROD' && inputs.build_and_deploy
-        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
@@ -135,7 +135,7 @@ jobs:
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
-        uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@add_config_file
+        uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@feature/add_config_file
         if: always()
         env:
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
