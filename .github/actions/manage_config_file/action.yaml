@@ -37,7 +37,7 @@ runs:
     - name: Set up Google Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
       with:
-        project_id: ${{ inputs.PROJECT_ID }}
+        project_id: ${{ env.PROJECT_ID }}
 
     # Upload or update the configuration file in GCS
     - name: Upload config file to GCS
@@ -47,7 +47,7 @@ runs:
         SERVICE: ${{ inputs.SERVICE }}
       run: |
         set -e
-        PROJECT_ID="${{ inputs.PROJECT_ID }}"
+        PROJECT_ID="${{ env.PROJECT_ID }}"
         # Bucket name convention: config_cloudrun_{compact_project_id}
         echo "PROJECT_ID: '$PROJECT_ID'"
         bucket_name="config_cloudrun_$(echo "$PROJECT_ID" | tr -d '-')"
