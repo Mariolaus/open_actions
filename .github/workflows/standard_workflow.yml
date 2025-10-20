@@ -77,7 +77,7 @@ jobs:
         with:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           SERVICE: ${{ inputs.service_name }}
-          CONFIG_PATH: "config"
+          CONFIG_PATH: "./"
           secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
 
       - name: Manage configuration file UAT
@@ -88,7 +88,7 @@ jobs:
         with:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           SERVICE: ${{ inputs.service_name }}
-          CONFIG_PATH: "config"
+          CONFIG_PATH: "./"
           secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
 
       # Build image and deploy to Cloud Run if we are on branch PROD only
