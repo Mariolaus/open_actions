@@ -74,18 +74,18 @@ jobs:
         uses: Mariolaus/open_actions/.github/actions/manage_config_file@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
         with:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
           SERVICE: ${{ inputs.service_name }}
           CONFIG_PATH: "./"
-          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
 
       - name: Manage configuration file UAT
         if: github.ref != 'refs/heads/PROD'
         uses: Mariolaus/open_actions/.github/actions/manage_config_file@feature/add_config_file
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
           secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
         with:
           SERVICE: ${{ inputs.service_name }}

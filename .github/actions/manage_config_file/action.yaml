@@ -2,18 +2,8 @@ name: "Create or Update Config file To GCS"
 description: "Upload or update the configuration file to the corresponding GCS bucket file"
 
 inputs:
-  PROJECT_ID:
-    description: "GCloud project ID"
-    required: true
   SERVICE:
     description: "Cloud Run service name"
-    required: true
-  REGION:
-    description: "GCloud region"
-    required: true
-    default: "europe-west8"
-  secrets:
-    description: "GCP service account key (JSON)"
     required: true
   CONFIG_PATH:
     description: "Relative path of the config file in the repository"
@@ -31,7 +21,7 @@ runs:
     - name: Google Auth
       uses: google-github-actions/auth@v2
       with:
-        credentials_json: ${{ inputs.secrets }}
+        credentials_json: ${{ env.secrets }}
 
     # Set up Google Cloud SDK
     - name: Set up Google Cloud SDK
@@ -43,44 +33,37 @@ runs:
     - name: Upload config file to GCS
       id: upload_config
       env:
+        PROJECT_ID: ${{ env.PROJECT_ID }}
         CONFIG_PATH: ${{ inputs.CONFIG_PATH }}
         SERVICE: ${{ inputs.SERVICE }}
+      shell: bash
       run: |
         set -e
-        PROJECT_ID="${{ env.PROJECT_ID }}"
-        # Bucket name convention: config_cloudrun_{compact_project_id}
         echo "PROJECT_ID: '$PROJECT_ID'"
         bucket_name="config_cloudrun_$(echo "$PROJECT_ID" | tr -d '-')"
         echo "Target bucket name: $bucket_name"
 
-        # Local path to config file
         local_config_path=$(echo "$SERVICE" | sed 's/-/_/g')_config.json
-
-        # Remote blob name
         blob_name=$(echo "$SERVICE" | sed 's/-/_/g')_config.json
         echo "Blob name: $blob_name"
 
         echo "Uploading configuration for service '$SERVICE'..."
 
         if [ ! -f "$local_config_path" ]; then
-          echo "Config file not found: $local_config_path"
+          echo "❌ Config file not found: $local_config_path"
           exit 1
         fi
 
-        # Check if bucket exists
         if ! gsutil ls -b "gs://$bucket_name" >/dev/null 2>&1; then
-          echo "Bucket does not exist. Config file not uploaded/updated."
+          echo "❌ Bucket does not exist. Config file not uploaded/updated."
+          exit 1
         fi
 
-        # Check if config file already exists in the bucket
         if gsutil -q stat "gs://$bucket_name/$blob_name"; then
-          echo "Config file already exists. Proceeding with the update."
+          echo "ℹ️ Config file already exists. Proceeding with update."
         else
-          echo "Config file does not exist. Proceeding with the upload."
+          echo "ℹ️ Config file does not exist. Proceeding with upload."
         fi
 
-        # Upload or update the config file
         gsutil cp -a private "$local_config_path" "gs://$bucket_name/$blob_name"
-
-        echo "Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
-      shell: bash
+        echo "✅ Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
