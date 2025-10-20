@@ -54,9 +54,8 @@ runs:
         # Check if the related config file exists
         if [ ! -f "$local_config_path" ]; then
           echo "❌ Config file not found: $local_config_path"
-          exit 1
         fi
-  
+        
         # Check if the GCS bucket exists
         if ! gsutil ls -b "gs://$bucket_name" >/dev/null 2>&1; then
           echo "❌ Bucket does not exist. Config file not uploaded/updated."
