@@ -39,7 +39,7 @@ runs:
       with:
         project_id: ${{ inputs.PROJECT_ID }}
 
-    # Upload or update the config file in GCS
+    # Upload or update the configuration file in GCS
     - name: Upload config file to GCS
       id: upload_config
       shell: bash
