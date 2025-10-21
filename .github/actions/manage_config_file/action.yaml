@@ -1,0 +1,98 @@
+name: "Create or Update Config file To GCS"
+description: "Upload or update the config file of the repository, if exist, in the correct Google Storage Bucket."
+
+inputs:
+  SERVICE:
+    description: "Cloud Run service name"
+    required: true
+  CONFIG_REF:
+    description: "Git branch reference (PROD for the production branch, UAT for all other branches) to get the correct config file to upload/update"
+    required: true
+
+
+runs:
+  using: "composite"
+  steps:
+    # Checkout repository
+    - name: Check out the repository
+      uses: actions/checkout@v4
+
+    # Authenticate with Google Cloud
+    - name: Google Auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ env.secrets }}
+
+    # Set up Google Cloud SDK
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        project_id: ${{ env.PROJECT_ID }}
+
+    # Upload or update the configuration file in GCS
+    - name: Upload config file to GCS
+      id: upload_config
+      env:
+        PROJECT_ID: ${{ env.PROJECT_ID }}
+        SERVICE: ${{ inputs.SERVICE }}
+        CONFIG_REF: ${{ inputs.CONFIG_REF }}
+      shell: bash
+      run: |
+        set -e
+        
+        # Build the bucket name using a compact project ID (remove '-')
+        bucket_name="config_cloudrun_$(echo "$PROJECT_ID" | tr -d '-')"
+        echo "Target bucket name: $bucket_name"
+        
+        # Build base config filename (replace '-' with underscore)
+        base_config_file=$(echo "$SERVICE" | sed 's/-/_/g')_config
+        echo "Base config filename: $base_config_file"
+        
+        # Determine the local config filename based on CONFIG_REF (PROD or UAT)
+        if [ "$CONFIG_REF" == "PROD" ]; then
+          config_filename=$base_config_file
+        else
+          config_filename=${base_config_file}_uat
+        fi
+        
+        # Possible file extensions
+        possible_extensions=("json" "config" "env")
+        
+        # Initialize variable – assume no file found yet
+        local_config_file=""
+        
+        # Search for the config file using one of the supported extensions
+        for ext in "${possible_extensions[@]}"; do
+          candidate="${config_filename}.${ext}"
+          if [ -f "$candidate" ]; then
+            local_config_file="$candidate"
+            echo "Found config file: $local_config_file"
+            break
+          fi
+        done
+        
+        # If no file was found, stop gracefully
+        if [ -z "$local_config_file" ]; then
+          echo "No configuration file found like '$config_filename' (extensions tried: ${possible_extensions[*]})."
+          exit 0
+        fi
+        
+        # Check if the GCS bucket exists
+        if ! gsutil ls -b "gs://$bucket_name" >/dev/null 2>&1; then
+          echo "Bucket does not exist. Config file not uploaded/updated."
+          exit 1
+        fi
+        
+        # Determine GS blob name (as base_config_file + real extension)
+        blob_name="${base_config_file}.${local_config_file##*.}"
+        
+        # Check if the blob already exists in the bucket
+        if gsutil -q stat "gs://$bucket_name/$blob_name"; then
+          echo "Config file already exists. Proceeding with update."
+        else
+          echo "Config file does not exist. Proceeding with upload."
+        fi
+
+        # Upload or overwrite the config file in GCS
+        gsutil cp "$local_config_file" "gs://$bucket_name/$blob_name"
+        echo "Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
