@@ -50,25 +50,43 @@ runs:
         
         # Determine the local config filename based on CONFIG_REF (PROD or UAT)
         if [ "$CONFIG_REF" == "PROD" ]; then
-          local_config_file=$base_config_file.json
+          config_filename=$base_config_file
         else
-          local_config_file=${base_config_file}_uat.json
+          config_filename=${base_config_file}_uat
         fi
         
-        # Check if the config file exists in the repository
-        if [ ! -f "$local_config_file" ]; then
-          echo "Config file $local_config_file not found in the repository. Skipping upload/update."
+        # Possible file extensions
+        possible_extensions=("json" "config" "env")
+        
+        # Initialize variable – assume no file found yet
+        local_config_file=""
+        
+        # Search for the config file using one of the supported extensions
+        for ext in "${possible_extensions[@]}"; do
+          candidate="${config_filename}.${ext}"
+          if [ -f "$candidate" ]; then
+            local_config_file="$candidate"
+            echo "Found config file: $local_config_file"
+            break
+          fi
+        done
+        
+        # If no file was found, stop gracefully
+        if [ -z "$local_config_file" ]; then
+          echo "No configuration file found like '$config_filename' (extensions tried: ${possible_extensions[*]})."
           exit 0
         fi
         
         # Check if the GCS bucket exists
         if ! gsutil ls -b "gs://$bucket_name" >/dev/null 2>&1; then
-          echo "❌ Bucket does not exist. Config file not uploaded/updated."
+          echo "Bucket does not exist. Config file not uploaded/updated."
           exit 1
         fi
         
+        # Determine GS blob name (preserves correct extension)
+        blob_name="${base_config_file}.${local_config_file##*.}"
+        
         # Check if the blob already exists in the bucket
-        blob_name=$base_config_file.json
         if gsutil -q stat "gs://$bucket_name/$blob_name"; then
           echo "Config file already exists. Proceeding with update."
         else
