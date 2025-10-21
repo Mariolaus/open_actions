@@ -83,7 +83,7 @@ runs:
           exit 1
         fi
         
-        # Determine GS blob name (preserves correct extension)
+        # Determine GS blob name (as base_config_file + real extension)
         blob_name="${base_config_file}.${local_config_file##*.}"
         
         # Check if the blob already exists in the bucket
