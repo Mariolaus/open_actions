@@ -5,10 +5,10 @@ inputs:
   SERVICE:
     description: "Cloud Run service name"
     required: true
-  CONFIG_PATH:
-    description: "Relative path of the config file in the repository"
-    required: false
-    default: "./"
+  CONFIG_REF:
+    description: "Git branch reference (PROD for the production branch, UAT for all other branches) to get the correct config file to upload/update"
+    required: true
+
 
 runs:
   using: "composite"
@@ -34,8 +34,8 @@ runs:
       id: upload_config
       env:
         PROJECT_ID: ${{ env.PROJECT_ID }}
-        CONFIG_PATH: ${{ inputs.CONFIG_PATH }}
         SERVICE: ${{ inputs.SERVICE }}
+        CONFIG_REF: ${{ inputs.CONFIG_REF }}
       shell: bash
       run: |
         set -e
@@ -44,14 +44,20 @@ runs:
         bucket_name="config_cloudrun_$(echo "$PROJECT_ID" | tr -d '-')"
         echo "Target bucket name: $bucket_name"
         
-        # Build local config file path (replace '-' with underscore)
-        local_config_path=$(echo "$SERVICE" | sed 's/-/_/g')_config.json
-        blob_name=$(echo "$SERVICE" | sed 's/-/_/g')_config.json
-        echo "Blob name: $blob_name"
-
-        # Check if the related config file exists
-        if [ ! -f "$local_config_path" ]; then
-          echo "Config file $local_config_path not found in the repository. Skipping upload/update."
+        # Build base config filename (replace '-' with underscore)
+        base_config_file=$(echo "$SERVICE" | sed 's/-/_/g')_config
+        echo "Base config filename: $base_config_file"
+        
+        # Determine the local config filename based on CONFIG_REF (PROD or UAT)
+        if [ "$CONFIG_REF" == "PROD" ]; then
+          local_config_file=$base_config_file.json
+        else
+          local_config_file=${base_config_file}_uat.json
+        fi
+        
+        # Check if the config file exists in the repository
+        if [ ! -f "$local_config_file" ]; then
+          echo "Config file $local_config_file not found in the repository. Skipping upload/update."
           exit 0
         fi
         
@@ -62,6 +68,7 @@ runs:
         fi
         
         # Check if the blob already exists in the bucket
+        blob_name=$base_config_file.json
         if gsutil -q stat "gs://$bucket_name/$blob_name"; then
           echo "Config file already exists. Proceeding with update."
         else
@@ -69,5 +76,5 @@ runs:
         fi
 
         # Upload or overwrite the config file in GCS
-        gsutil cp "$local_config_path" "gs://$bucket_name/$blob_name"
+        gsutil cp "$local_config_file" "gs://$bucket_name/$blob_name"
         echo "Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
