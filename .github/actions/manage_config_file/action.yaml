@@ -49,11 +49,10 @@ runs:
         blob_name=$(echo "$SERVICE" | sed 's/-/_/g')_config.json
         echo "Blob name: $blob_name"
 
-        echo "Uploading configuration for service '$SERVICE'..."
-        
         # Check if the related config file exists
         if [ ! -f "$local_config_path" ]; then
-          echo "❌ Config file not found: $local_config_path"
+          echo "Config file $local_config_path not found in the repository. Skipping upload/update."
+          exit 0
         fi
         
         # Check if the GCS bucket exists
