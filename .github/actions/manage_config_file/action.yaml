@@ -61,9 +61,9 @@ runs:
         # Initialize variable – assume no file found yet
         local_config_file=""
         
-        # Search for the config file using one of the supported extensions
+        # Search for the config file using one of the supported extensions, in 'config' directory
         for ext in "${possible_extensions[@]}"; do
-          candidate="${config_filename}.${ext}"
+          candidate="config/${config_filename}.${ext}"
           if [ -f "$candidate" ]; then
             local_config_file="$candidate"
             echo "Found config file: $local_config_file"
