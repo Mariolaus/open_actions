@@ -31,6 +31,12 @@ runs:
         credentials_json: ${{ env.credentials_json }}
         create_credentials_file: false
 
+    - name: Activate SA manually
+      run: |
+        echo "${{ env.credentials_json }}" > /tmp/sa.json
+        gcloud auth activate-service-account --key-file=/tmp/sa.json
+      shell: bash
+
     - name: Verify gcloud auth
       run: |
         gcloud auth list
