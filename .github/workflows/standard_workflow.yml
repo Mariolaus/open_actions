@@ -34,9 +34,9 @@ jobs:
       # Add IP to whitelist
       - name: Enable Github worker IP
         id: add_ip
-        uses: Mariolaus/open_actions/.github/actions/add_worker_ip@main
+        uses: Mariolaus/open_actions/.github/actions/add_worker_ip@cer
         env:
-          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
         with:
           ip: $(curl ifconfig.me)
@@ -59,34 +59,34 @@ jobs:
       - name: run tests
         if: ${{ inputs.run_tests }}
         id: run_tests
-        uses: Mariolaus/open_actions/.github/actions/run_tests@main
+        uses: Mariolaus/open_actions/.github/actions/run_tests@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Check code quality
         if: github.ref == 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/check_code_quality@main
+        uses: Mariolaus/open_actions/.github/actions/check_code_quality@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Manage configuration file (PROD)
         if: github.ref == 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/manage_config_file@main
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
-          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_CER_PROD }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}
         with:
           SERVICE: ${{ inputs.service_name }}
           CONFIG_REF: "PROD"
 
       - name: Manage configuration file (UAT)
         if: github.ref != 'refs/heads/PROD'
-        uses: Mariolaus/open_actions/.github/actions/manage_config_file@main
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
-          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_CER_UAT }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_UAT }}
         with:
           SERVICE: ${{ inputs.service_name }}
           CONFIG_REF: "UAT"
@@ -94,11 +94,11 @@ jobs:
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy
-        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
+        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
+          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_CER_PROD }}
         with:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
@@ -123,11 +123,11 @@ jobs:
       # Build image and deploy to Cloud Run if we are on branch UAT only
       - name: UAT -- Build image and Deploy to Cloud Run
         if: github.ref != 'refs/heads/PROD' && inputs.build_and_deploy
-        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@main
+        uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
-          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
-          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
+          GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_UAT }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_CER_UAT }}
         with:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
@@ -135,10 +135,10 @@ jobs:
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
-        uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@main
+        uses: Mariolaus/open_actions/.github/actions/delete_worker_ip@cer
         if: always()
         env:
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
-          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
+          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}'
         with:
           github_id: "${{ steps.add_ip.outputs.github_id }}"
