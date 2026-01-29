@@ -36,9 +36,8 @@ jobs:
         id: add_ip
         uses: Mariolaus/open_actions/.github/actions/add_worker_ip@cer
         env:
-          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_CER_UAT }}'
+          credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
-          PROJECT_ID: '${{ secrets.PROJECT_ID_CER_UAT }}'
         with:
           ip: $(curl ifconfig.me)
 
@@ -65,13 +64,13 @@ jobs:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Check code quality
-        if: github.ref == 'refs/heads/CER_PROD'
+        if: github.ref == 'refs/heads/PROD'
         uses: Mariolaus/open_actions/.github/actions/check_code_quality@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Manage configuration file (PROD)
-        if: github.ref == 'refs/heads/CER_PROD'
+        if: github.ref == 'refs/heads/PROD'
         uses: Mariolaus/open_actions/.github/actions/manage_config_file@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
@@ -79,10 +78,10 @@ jobs:
           secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}
         with:
           SERVICE: ${{ inputs.service_name }}
-          CONFIG_REF: "CER_PROD"
+          CONFIG_REF: "PROD"
 
       - name: Manage configuration file (UAT)
-        if: github.ref != 'refs/heads/CER_PROD'
+        if: github.ref != 'refs/heads/PROD'
         uses: Mariolaus/open_actions/.github/actions/manage_config_file@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
@@ -90,11 +89,11 @@ jobs:
           secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_CER_UAT }}
         with:
           SERVICE: ${{ inputs.service_name }}
-          CONFIG_REF: "CER_UAT"
+          CONFIG_REF: "UAT"
 
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
-        if: github.ref == 'refs/heads/CER_PROD' && inputs.build_and_deploy
+        if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
@@ -106,7 +105,7 @@ jobs:
           secrets: ${{ inputs.secrets }}
 
       - name: Sanitize branch name for Cloud Run UAT
-        if: github.ref != 'refs/heads/CER_PROD'
+        if: github.ref != 'refs/heads/PROD'
         id: sanitize
         run: |
           RAW_BRANCH="${GITHUB_REF_NAME}"
@@ -123,7 +122,7 @@ jobs:
 
       # Build image and deploy to Cloud Run if we are on branch UAT only
       - name: UAT -- Build image and Deploy to Cloud Run
-        if: github.ref != 'refs/heads/CER_PROD' && inputs.build_and_deploy
+        if: github.ref != 'refs/heads/PROD' && inputs.build_and_deploy
         uses: Mariolaus/open_actions/.github/actions/build_image_and_deploy_to_cloud_run@cer
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
