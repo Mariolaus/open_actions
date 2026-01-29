@@ -19,6 +19,6 @@ runs:
     - name: Remove GitHub Worker IP from Authorized IPs
       id: add_ip_step
       run: |
-        ID_TOKEN=$(gcloud auth print-identity-token)
+        ID_TOKEN=$(gcloud auth print-identity-token --audiences="${{ env.DEVOPS_ENDPOINT }}")
         curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}/delete_ip?github_id=${{ inputs.github_id }}"
       shell: bash

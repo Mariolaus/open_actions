@@ -23,6 +23,9 @@ runs:
     - name: Add GitHub Worker IP to Authorized IPs
       id: add_ip_step
       run: |
+        echo "=== CREDENZIALI ATTIVE ==="
+        gcloud auth list
+        gcloud config list account
         ID_TOKEN=$(gcloud auth print-identity-token --audiences="${{ env.DEVOPS_ENDPOINT }}")
         github_id=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}/add_ip?ip=${{ inputs.ip }}")
         github_id=$(echo "$github_id" | jq -r '.output')
