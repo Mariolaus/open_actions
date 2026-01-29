@@ -33,7 +33,7 @@ runs:
 
     - name: Activate SA manually
       run: |
-        echo "${{ env.credentials_json }}" > /tmp/sa.json
+        printf '%s' "${{ env.credentials_json }}" > /tmp/sa.json
         gcloud auth activate-service-account --key-file=/tmp/sa.json
       shell: bash
 
