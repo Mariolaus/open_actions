@@ -15,6 +15,9 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+
     - name: Debug credentials
       run: |
         if [ -z "${{ env.credentials_json }}" ]; then

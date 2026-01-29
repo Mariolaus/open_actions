@@ -38,6 +38,7 @@ jobs:
         env:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_CER_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
+          PROJECT_ID: '${{ secrets.PROJECT_ID_CER_PROD }}'
         with:
           ip: $(curl ifconfig.me)
 
