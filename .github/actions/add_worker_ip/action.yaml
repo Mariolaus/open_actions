@@ -15,44 +15,15 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - name: Debug credentials
-      run: |
-        if [ -z "${{ env.credentials_json }}" ]; then
-          echo "credentials_json is EMPTY"
-          exit 1
-        else
-          echo "credentials_json is SET"
-        fi
-      shell: bash
-
     - name: Google Auth
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ env.credentials_json }}
-        create_credentials_file: false
-
-    - name: Activate SA manually
-      run: |
-        printf '%s' "${{ env.credentials_json }}" > /tmp/sa.json
-        gcloud auth activate-service-account --key-file=/tmp/sa.json
-      shell: bash
-
-    - name: Verify gcloud auth
-      run: |
-        gcloud auth list
-        gcloud config get-value account
-      shell: bash
-
-    - name: Set project
-      run: |
-        echo "Setting project to ${{ env.PROJECT_ID }}"
-        gcloud config set project ${{ env.PROJECT_ID }}
-      shell: bash
 
     - name: Add GitHub Worker IP to Authorized IPs
       id: add_ip_step
       run: |
-        ID_TOKEN=$(gcloud auth print-identity-token --audiences="${{ env.DEVOPS_ENDPOINT }}")
+        ID_TOKEN=$(gcloud auth print-identity-token)
         github_id=$(curl -H "Authorization: Bearer ${ID_TOKEN}" "${{ env.DEVOPS_ENDPOINT }}/add_ip?ip=${{ inputs.ip }}")
         github_id=$(echo "$github_id" | jq -r '.output')
         echo "github_id=${github_id}" >> $GITHUB_OUTPUT
