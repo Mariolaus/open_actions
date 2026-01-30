@@ -25,6 +25,8 @@ on:
     secrets:
       READ_ALL_REPOS_TOKEN:
         required: true
+      DEVOPS_ENDPOINT:
+        required: true
       GCP_BUILD_AND_DEPLOY_PROD:
         required: false
       GCP_BUILD_AND_DEPLOY_UAT:
@@ -33,16 +35,6 @@ on:
         required: false
       PROJECT_ID_GCP_UAT:
         required: false
-      GCP_BUILD_AND_DEPLOY_CER_PROD:
-        required: false
-      GCP_BUILD_AND_DEPLOY_CER_UAT:
-        required: false
-      PROJECT_ID_CER_PROD:
-        required: false
-      PROJECT_ID_CER_UAT:
-        required: false
-      DEVOPS_ENDPOINT:
-        required: true
 
 jobs:
   install-dependencies:
