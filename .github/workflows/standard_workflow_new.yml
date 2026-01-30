@@ -24,7 +24,7 @@ on:
         default: true
     secrets:
       READ_ALL_REPOS_TOKEN:
-        required: true
+        required: false
       GCP_BUILD_AND_DEPLOY_PROD:
         required: false
       GCP_BUILD_AND_DEPLOY_UAT:
@@ -34,7 +34,7 @@ on:
       PROJECT_ID_GCP_UAT:
         required: false
       DEVOPS_ENDPOINT:
-        required: true
+        required: false
 
 jobs:
   install-dependencies:
