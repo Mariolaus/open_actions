@@ -33,6 +33,14 @@ on:
         required: false
       PROJECT_ID_GCP_UAT:
         required: false
+      GCP_BUILD_AND_DEPLOY_CER_PROD:
+        required: false
+      GCP_BUILD_AND_DEPLOY_CER_UAT:
+        required: false
+      PROJECT_ID_CER_PROD:
+        required: false
+      PROJECT_ID_CER_UAT:
+        required: false
       DEVOPS_ENDPOINT:
         required: false
 
