@@ -17,15 +17,24 @@ on:
         required: false
         type: string
         default: true
-      secrets:
-        description: "xxx"
-        required: false
-        type: string
       build_and_deploy:
         description: "build and deploy steps"
         required: false
         type: boolean
         default: true
+    secrets:
+      READ_ALL_REPOS_TOKEN:
+        required: true
+      GCP_BUILD_AND_DEPLOY_PROD:
+        required: false
+      GCP_BUILD_AND_DEPLOY_UAT:
+        required: false
+      PROJECT_ID_GCP_PROD:
+        required: false
+      PROJECT_ID_GCP_UAT:
+        required: false
+      DEVOPS_ENDPOINT:
+        required: true
 
 jobs:
   install-dependencies:
