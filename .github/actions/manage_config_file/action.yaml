@@ -6,7 +6,7 @@ inputs:
     description: "Cloud Run service name"
     required: true
   CONFIG_REF:
-    description: "Git branch reference (CER_PROD for the production branch, CER_UAT for all other branches) to get the correct config file to upload/update"
+    description: "Git branch reference (PROD for the production branch, UAT for all other branches) to get the correct config file to upload/update"
     required: true
 
 
@@ -49,7 +49,7 @@ runs:
         echo "Base config filename: $base_config_file"
         
         # Determine the local config filename based on CONFIG_REF (PROD or UAT)
-        if [ "$CONFIG_REF" == "CER_PROD" ]; then
+        if [ "$CONFIG_REF" == "PROD" ]; then
           config_filename=$base_config_file
         else
           config_filename=${base_config_file}_uat
