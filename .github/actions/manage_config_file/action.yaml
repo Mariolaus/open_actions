@@ -94,5 +94,5 @@ runs:
         fi
 
         # Upload or overwrite the config file in GCS
-        gsutil cp "$local_config_file" "gs://$bucket_name/$blob_name$blob_name"
+        gsutil cp "$local_config_file" "gs://$bucket_name/$blob_name"
         echo "Config file uploaded/updated successfully in gs://$bucket_name/$blob_name"
