@@ -101,13 +101,14 @@ runs:
         # Se il flag run_react è true, costruisci prima la React app
         if [[ "${{ inputs.run_react }}" == "true" ]]; then
           echo "Building React app..."
-          if [[ "${{ inputs.branch_name }}" == "main" ]]; then
+          if [[ "${{ inputs.branch_name }}" == "PROD" ]]; then
             export VITE_ENV=prod
           else
             export VITE_ENV=uat
           fi
           npm install
           npm run build
+          echo "✅ React app built with VITE_ENV=$VITE_ENV"
         fi
     
         # Esegui il comando docker build originale (per repo in Python)
