@@ -25,10 +25,12 @@ on:
       run_react:
         description: "Build React app before docker build"
         required: false
+        type: boolean
         default: false
       branch_name:
         description: "Branch name to determine VITE_ENV"
         required: false
+        type: string
     secrets:
       READ_ALL_REPOS_TOKEN:
         required: true
