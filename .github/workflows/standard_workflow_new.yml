@@ -22,15 +22,6 @@ on:
         required: false
         type: boolean
         default: true
-      run_react:
-        description: "Build React app before docker build"
-        required: false
-        type: boolean
-        default: false
-      branch_name:
-        description: "Branch name to determine VITE_ENV"
-        required: false
-        type: string
     secrets:
       READ_ALL_REPOS_TOKEN:
         required: true
@@ -109,6 +100,9 @@ jobs:
           SERVICE: ${{ inputs.service_name }}
           CONFIG_REF: "UAT"
 
+
+
+
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy
@@ -121,8 +115,6 @@ jobs:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
-          run_react: ${{ inputs.run_react }}
-          branch_name: ${{ inputs.branch_name || github.ref_name }}
 
       - name: Sanitize branch name for Cloud Run UAT
         if: github.ref != 'refs/heads/PROD'
@@ -152,8 +144,6 @@ jobs:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
-          run_react: ${{ inputs.run_react }}
-          branch_name: ${{ inputs.branch_name || github.ref_name }}
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP

@@ -17,13 +17,6 @@ inputs:
   secrets:
     description: "xxx"
     required: false
-  run_react:
-    description: "Flag to build React app"
-    required: false
-    default: false
-  branch_name:
-    description: "Branch name for VITE_ENV"
-    required: false
 
 
 runs:
@@ -97,21 +90,8 @@ runs:
       run: |
         image_id="${{ inputs.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ inputs.SERVICE }}/${{ inputs.SERVICE }}:${{ env.GIT_TAG }}"
         echo "image_id=$image_id" >> $GITHUB_OUTPUT
-    
-        # Se il flag run_react è true, costruisci prima la React app
-        if [[ "${{ inputs.run_react }}" == "true" ]]; then
-          echo "Building React app..."
-          if [[ "${{ inputs.branch_name }}" == "PROD" ]]; then
-            export VITE_ENV=prod
-          else
-            export VITE_ENV=uat
-          fi
-          npm install
-          npm run build
-          echo "✅ React app built with VITE_ENV=$VITE_ENV"
-        fi
-    
-        # Esegui il comando docker build originale (per repo in Python)
+      
+        # Esegui il comando docker build fornito
         ${{ inputs.run_command }}
       shell: bash
 
