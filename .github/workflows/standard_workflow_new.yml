@@ -105,9 +105,6 @@ jobs:
           SERVICE: ${{ inputs.service_name }}
           CONFIG_REF: "UAT"
 
-
-
-
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy

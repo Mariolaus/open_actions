@@ -96,6 +96,12 @@ runs:
         FIREBASE_API_KEY=$(gcloud secrets versions access latest \
           --secret=FIREBASE_API_KEY \
           --project=${{ env.PROJECT_ID }} 2>/dev/null)
+        
+        #verifica se la variabile è vuota, in caso affermativo stampa un messaggio di errore e termina l'esecuzione
+        if [ -z "$FIREBASE_API_KEY" ]; then
+        echo "Error: Unable to access Firebase API Key from Secret Manager. Please ensure the secret exists and the service account has access."
+        exit 1
+        fi
     
         echo "FIREBASE_API_KEY<<EOF" >> $GITHUB_ENV
         echo "$FIREBASE_API_KEY" >> $GITHUB_ENV
