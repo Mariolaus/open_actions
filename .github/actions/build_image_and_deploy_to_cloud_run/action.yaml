@@ -94,7 +94,7 @@ runs:
       run: |
         echo "Reading Firebase API Key from Google Secret Manager..."
         FIREBASE_API_KEY=$(gcloud secrets versions access latest \
-          --secret=FIREBASE_API_KEY \
+          --secret=PROVA \
           --project=${{ env.PROJECT_ID }} 2>/dev/null)
         
         #verifica se la variabile è vuota, in caso affermativo stampa un messaggio di errore e termina l'esecuzione
