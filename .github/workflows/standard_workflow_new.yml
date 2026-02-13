@@ -20,7 +20,7 @@ on:
       react_project:
         description: "it's a react app?"
         required: false
-        type: string
+        type: boolean
         default: 'false'
       build_and_deploy:
         description: "build and deploy steps"
