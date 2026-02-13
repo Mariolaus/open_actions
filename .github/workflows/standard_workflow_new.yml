@@ -58,8 +58,7 @@ jobs:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
         with:
-          ip: $(curl ifconfig.me)
-          echo "Runner IP: $(curl -s ifconfig.me)"
+          ip: $(curl - s ifconfig.me)
 
       - name: Validate service_name input
         run: |
