@@ -21,7 +21,7 @@ on:
         description: "it's a react app?"
         required: false
         type: string
-        default: false
+        default: 'false'
       build_and_deploy:
         description: "build and deploy steps"
         required: false
@@ -147,6 +147,7 @@ jobs:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
+          react_project: ${{ inputs.react_project }}
 
       # Clean up: Remove IP from whitelist
       - name: Disable Github worker IP
