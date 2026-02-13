@@ -48,7 +48,7 @@ jobs:
       # Add IP to whitelist
       - name: stampa ip
         run: |
-          IP=$(curl -s ifconfig.me)
+          IP=$(curl checkip.amazonaws.com)
           echo "Runner IP: $IP"
 
       - name: Enable Github worker IP
@@ -58,7 +58,7 @@ jobs:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
         with:
-          ip: $(curl -s ifconfig.me)
+          ip: $(curl checkip.amazonaws.com)
 
       - name: Validate service_name input
         run: |
