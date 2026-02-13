@@ -46,11 +46,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Add IP to whitelist
-      - name: stampa ip
-        run: |
-          IP=$(curl checkip.amazonaws.com)
-          echo "Runner IP: $IP"
-
       - name: Enable Github worker IP
         id: add_ip
         uses: Mariolaus/open_actions/.github/actions/add_worker_ip@cer
