@@ -117,6 +117,7 @@ jobs:
           SERVICE: ${{ inputs.service_name }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
+          react_project: ${{ inputs.react_project }}
 
       - name: Sanitize branch name for Cloud Run UAT
         if: github.ref != 'refs/heads/PROD'
