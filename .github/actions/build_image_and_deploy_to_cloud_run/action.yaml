@@ -107,7 +107,11 @@ runs:
         echo "Error: Unable to access Firebase API Key from Secret Manager. Please ensure the secret exists and the service account has access."
         exit 1
         fi
+        
+        # Esporta la chiave API come variabile d'ambiente per i passaggi successivi
+        echo "FIREBASE_API_KEY<<EOF" >> $GITHUB_ENV
         echo "$FIREBASE_API_KEY" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
       shell: bash
 
     # Build Image
