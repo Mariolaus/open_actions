@@ -39,7 +39,7 @@ jobs:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
         with:
-          ip: $(curl ifconfig.me)
+          ip: $(curl checkip.amazonaws.com)
 
       - name: Validate service_name input
         run: |
