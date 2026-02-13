@@ -95,7 +95,7 @@ runs:
     # Load GCloud Secret if react_project is set to true
     - name: Get Firebase API Key
       id: get_gcloud_secrets
-      if: ${{ inputs.react_project == 'true' }}
+      if: inputs.react_project
       run: |
         echo "Reading Firebase API Key from Google Secret Manager..."
         FIREBASE_API_KEY=$(gcloud secrets versions access latest \
