@@ -26,6 +26,11 @@ on:
         required: false
         type: boolean
         default: true
+      code_quality:
+        description: "check code quality"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   install-dependencies:
@@ -64,7 +69,7 @@ jobs:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
       - name: Check code quality
-        if: github.ref == 'refs/heads/PROD'
+        if: github.ref == 'refs/heads/PROD' && inputs.code_quality
         uses: Mariolaus/open_actions/.github/actions/check_code_quality@main
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
