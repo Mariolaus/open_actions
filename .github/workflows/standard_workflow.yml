@@ -44,7 +44,7 @@ jobs:
           credentials_json: '${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}'
           DEVOPS_ENDPOINT: '${{ secrets.DEVOPS_ENDPOINT }}'
         with:
-          ip: $(curl ifconfig.me)
+          ip: $(curl checkip.amazonaws.com)
 
       - name: Validate service_name input
         run: |
@@ -74,6 +74,28 @@ jobs:
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
 
+      - name: Manage configuration file (PROD)
+        if: github.ref == 'refs/heads/PROD'
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@main
+        env:
+          READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
+        with:
+          SERVICE: ${{ inputs.service_name }}
+          CONFIG_REF: "PROD"
+
+      - name: Manage configuration file (UAT)
+        if: github.ref != 'refs/heads/PROD'
+        uses: Mariolaus/open_actions/.github/actions/manage_config_file@main
+        env:
+          READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
+          PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
+          secrets: ${{ secrets.GCP_BUILD_AND_DEPLOY_UAT }}
+        with:
+          SERVICE: ${{ inputs.service_name }}
+          CONFIG_REF: "UAT"
+
       # Build image and deploy to Cloud Run if we are on branch PROD only
       - name: Build image and Deploy to Cloud Run
         if: github.ref == 'refs/heads/PROD' && inputs.build_and_deploy
@@ -81,8 +103,6 @@ jobs:
         env:
           READ_ALL_REPOS_TOKEN: ${{ secrets.READ_ALL_REPOS_TOKEN }}
           GCP_BUILD_AND_DEPLOY: ${{ secrets.GCP_BUILD_AND_DEPLOY_PROD }}
-          DEVOPS_MICROVM_RSA: ${{ secrets.DEVOPS_MICROVM_RSA }}
-          DEVOPS_GCLOUD_CREDENTIALS: ${{ secrets.DEVOPS_GCLOUD_CREDENTIALS }}
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
         with:
           SERVICE: ${{ inputs.service_name }}
