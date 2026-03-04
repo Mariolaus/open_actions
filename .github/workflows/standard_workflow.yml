@@ -7,6 +7,10 @@ on:
         description: "Service name for Cloud Run"
         required: true
         type: string
+      region:
+        description: "Region for Cloud Run"
+        required: false
+        type: string
       run_tests:
         description: "should it run python tests?"
         required: false
@@ -106,6 +110,7 @@ jobs:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_PROD }}
         with:
           SERVICE: ${{ inputs.service_name }}
+          REGION: ${{ inputs.region }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
 
@@ -135,6 +140,7 @@ jobs:
           PROJECT_ID: ${{ secrets.PROJECT_ID_GCP_UAT }}
         with:
           SERVICE: ${{ inputs.service_name }}-${{ steps.sanitize.outputs.branch }}
+          REGION: ${{ inputs.region }}
           run_command: ${{ inputs.run_command }}
           secrets: ${{ inputs.secrets }}
 
