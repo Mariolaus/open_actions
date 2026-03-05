@@ -11,6 +11,7 @@ on:
         description: "Region for Cloud Run"
         required: false
         type: string
+        default: "europe-west8"
       run_tests:
         description: "should it run python tests?"
         required: false
